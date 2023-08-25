@@ -1,6 +1,13 @@
 use scraper::Selector;
 use table_extract::Table;
+use mongodb::{Client, options::{ClientOptions, ResolverConfig}};
+use std::env;
+use std::error::Error;
+use bson::to_document;
+use tokio;
+use serde::{Serialize, Deserialize};
 
+#[derive(Serialize, Deserialize)]
 struct Sighting {
     date: String,
     city: String,
@@ -11,7 +18,35 @@ struct Sighting {
     description: String,
     report_date: String,
 }
-fn main() {
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn Error>> {
+
+    // Load the MongoDB connection string from an environment variable:
+    let client_uri = env::var("MONGODB_URI").expect("You must set the MONGODB_URI environment var!");
+    let client = Client::with_uri_str(client_uri).await?;
+    let sightings_collection = client.database("i_want_to_believe").collection::<Sighting>("sightings");
+    let sighting = Sighting {
+        date: "<a></a>".to_string(),
+        city: "Helsinki".to_string(),
+        state: "".to_string(),
+        country: "Finland".to_string(),
+        shape: "Humanoid".to_string(),
+        duration: "6 minsaa".to_string(),
+        description: "Hieno kuvaus".to_string(),
+        report_date: "27232/023".to_string(),
+    };
+    let sighting2 = Sighting {
+        date: "<a></a>".to_string(),
+        city: "Helsinki".to_string(),
+        state: "".to_string(),
+        country: "Finland".to_string(),
+        shape: "Humanoidit on mahtavia".to_string(),
+        duration: "7 minsaa".to_string(),
+        description: "Hieno kuvaus".to_string(),
+        report_date: "27232/023".to_string(),
+    };
+    sightings_collection.insert_many([sighting, sighting2], None).await?;
 
     /*let ufo_response = reqwest::blocking::get("https://nuforc.org/webreports/ndxpost.html")
         .unwrap()
@@ -25,7 +60,7 @@ fn main() {
         .skip(1)
         .map(|x| format!("{}{}", "https://nuforc.org/webreports/", x));
     ufo_links.for_each(|x| println!("{}", x));
-    */
+
 
     let ufo_response = reqwest::blocking::get("https://nuforc.org/webreports/ndxp230710.html")
         .unwrap()
@@ -58,4 +93,6 @@ fn main() {
         println!("description: {}", sight.description);
         println!("report_date: {}", sight.report_date);
     }
+    */
+   Ok(())
 }
