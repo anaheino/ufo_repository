@@ -325,6 +325,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "chronoutil"
+version = "0.2.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "154aa5253c981d51e9466afc1e9ce41631197837fd1c41ee931008f229b8a3d7"
+dependencies = [
+ "chrono",
+]
+
+[[package]]
 name = "concurrent-queue"
 version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2553,6 +2562,7 @@ dependencies = [
  "async-std",
  "bson",
  "chrono",
+ "chronoutil",
  "mongodb",
  "reqwest",
  "scraper 0.17.1",
