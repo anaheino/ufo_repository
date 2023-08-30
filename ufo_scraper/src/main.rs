@@ -1,10 +1,9 @@
 use scraper::{Html, Selector};
-use table_extract::Table;
 use mongodb::Client;
 use std::{env, time::Duration};
 use async_std::task;
 use std::error::Error;
-use bson::{doc, to_document};
+use bson::{doc};
 use chrono::{Datelike, NaiveDate, NaiveDateTime};
 use chronoutil::shift_years;
 use tokio;
@@ -144,7 +143,7 @@ fn correct_date(mut date_time: NaiveDateTime) -> NaiveDateTime {
 
 fn generate_sleep_milliseconds() -> u64 {
     let mut rng = rand::thread_rng();
-    return rng.gen_range(1500..3000);
+    return rng.gen_range(3000..5000);
 }
 
 fn parse_a_element_link_and_content(html_text: &str) -> AElement {
