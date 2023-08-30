@@ -82,16 +82,34 @@ async fn fetch_page_links(link: &String) -> Result<Vec<Sighting>, Box<dyn Error>
         let row_slice = row.as_slice();
         let date_link = row_slice.get(0).unwrap_or(&"<a href=\"no-link-here\">0/0/70 00:00</a>".to_string()).to_string();
         let a_element: AElement = parse_a_element_link_and_content(&date_link);
-        let mut date_time = NaiveDateTime::parse_from_str(
+        let mut date_time;
+        let date_time_parse = NaiveDateTime::parse_from_str(
             &a_element.text,
             "%m/%d/%Y %R"
-        ).unwrap();
+        );
+        if date_time_parse.is_ok() {
+            date_time = date_time_parse.unwrap();
+        } else {
+            date_time = NaiveDateTime::parse_from_str(
+                "01/01/70 00:00",
+                "%m/%d/%Y %R"
+            ).unwrap();
+        }
         date_time = correct_date(date_time);
         let report_date = row_slice.get(7).unwrap_or(&"0/0/70".to_string()).to_string();
-        let mut report_date_time = NaiveDate::parse_from_str(
+        let mut report_date_time;
+        let report_date_time_parse = NaiveDate::parse_from_str(
             &report_date.to_string(),
             "%m/%d/%Y"
-        ).unwrap().and_hms_opt(0, 0, 0).unwrap();
+        );
+        if report_date_time_parse.is_ok() {
+            report_date_time = report_date_time_parse.unwrap().and_hms_opt(0, 0, 0).unwrap();
+        } else {
+            report_date_time = NaiveDateTime::parse_from_str(
+                "01/01/70 00:00",
+                "%m/%d/%Y %R"
+            ).unwrap();
+        }
         report_date_time = correct_date(report_date_time);
         let full_link = format!("{}{}", "https://nuforc.org/webreports/", a_element.link);
         let has_images_content = row_slice.get(8).unwrap_or(&"".to_string()).to_string().to_lowercase();
