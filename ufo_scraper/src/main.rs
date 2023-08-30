@@ -1,6 +1,6 @@
 use scraper::{Html, Selector};
 use table_extract::Table;
-use mongodb::{Client, options::{ClientOptions, ResolverConfig}};
+use mongodb::{Client, Collection, options::{ClientOptions, ResolverConfig}};
 use std::{env, time::Duration};
 use async_std::task;
 use std::error::Error;
@@ -37,8 +37,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let client_uri = env::var("MONGODB_UFO_URI").expect("You must set the MONGODB_URI environment var!");
     let client = Client::with_uri_str(client_uri).await?;
     let sightings_collection = client.database("i_want_to_believe").collection::<Sighting>("sightings");
+    println!("Clearing database...");
     sightings_collection.delete_many(doc! {}, None).await?;
-
 
     let ufo_response = reqwest::get("https://nuforc.org/webreports/ndxpost.html")
         .await?
@@ -48,19 +48,29 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let selector = Selector::parse("a").unwrap();
     let ufo_pages = ufo_document.select(&selector)
         .filter_map(|n| n.value().attr("href"));
-    let ufo_links = ufo_pages
+    let ufo_links: Vec<_> = ufo_pages
         .skip(1)
-        .map(|x| format!("{}{}", "https://nuforc.org/webreports/", x));
+        .map(|x| format!("{}{}", "https://nuforc.org/webreports/", x))
+        .collect();
 
-    println!("Found {} different report pages...", ufo_links.count());
+    println!("Found {} different report pages...", ufo_links.len());
 
-    let mut sleep_milliseconds = generate_sleep_milliseconds();
+    let sleep_milliseconds = generate_sleep_milliseconds();
     println!("Sleeping for {} milliseconds...", sleep_milliseconds);
     task::sleep(Duration::from_millis(sleep_milliseconds)).await;
-
-
-    println!("Fetching current ufo link...");
-    let ufo_response = reqwest::get("https://nuforc.org/webreports/ndxp230710.html")
+    for link in &ufo_links {
+        let sightings = fetch_page_links(link).await?;
+        println!("Inserting {} sightings to mongoDb...", sightings.len());
+        sightings_collection.insert_many(sightings, None).await?;
+        let sleep_milliseconds = generate_sleep_milliseconds();
+        println!("Sleeping for {} milliseconds...", sleep_milliseconds);
+        task::sleep(Duration::from_millis(sleep_milliseconds)).await;
+    }
+    Ok(())
+}
+async fn fetch_page_links(link: &String) -> Result<Vec<Sighting>, Box<dyn Error>> {
+    println!("Fetching current ufo link: {}...", link);
+    let ufo_response = reqwest::get(link)
         .await?
         .text()
         .await?;
@@ -86,28 +96,22 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let full_link = format!("{}{}", "https://nuforc.org/webreports/", a_element.link);
         let has_images_content = row_slice.get(8).unwrap_or(&"".to_string()).to_string().to_lowercase();
         sightings.push(
-          Sighting {
-              date: date_time.format("%FT%T").to_string(),
-              city: row_slice.get(1).unwrap_or(&"Unavailable".to_string()).to_string(),
-              state: row_slice.get(2).unwrap_or(&"Unavailable".to_string()).to_string(),
-              country: row_slice.get(3).unwrap_or(&"Unavailable".to_string()).to_string(),
-              shape: row_slice.get(4).unwrap_or(&"Unavailable".to_string()).to_string(),
-              duration: row_slice.get(5).unwrap_or(&"Unavailable".to_string()).to_string(),
-              description: row_slice.get(6).unwrap_or(&"Unavailable".to_string()).to_string(),
-              report_date: report_date_time.format("%FT%T").to_string(),
-              has_images: has_images_content.eq("yes"),
-              link: full_link
-          });
+            Sighting {
+                date: date_time.format("%FT%T").to_string(),
+                city: row_slice.get(1).unwrap_or(&"Unavailable".to_string()).to_string(),
+                state: row_slice.get(2).unwrap_or(&"Unavailable".to_string()).to_string(),
+                country: row_slice.get(3).unwrap_or(&"Unavailable".to_string()).to_string(),
+                shape: row_slice.get(4).unwrap_or(&"Unavailable".to_string()).to_string(),
+                duration: row_slice.get(5).unwrap_or(&"Unavailable".to_string()).to_string(),
+                description: row_slice.get(6).unwrap_or(&"Unavailable".to_string()).to_string(),
+                report_date: report_date_time.format("%FT%T").to_string(),
+                has_images: has_images_content.eq("yes"),
+                link: full_link
+            });
     }
-    println!("Inserting {} sightings to mongoDb...", sightings.len());
-    sightings_collection.insert_many(sightings, None).await?;
-    sleep_milliseconds = generate_sleep_milliseconds();
-    println!("Sleeping for {} milliseconds...", sleep_milliseconds);
-    task::sleep(Duration::from_millis(sleep_milliseconds)).await;
 
-    Ok(())
+    Ok(sightings)
 }
-
 fn correct_date(mut date_time: NaiveDateTime) -> NaiveDateTime {
     if date_time.year() > 23 {
         date_time = shift_years(date_time, 1900);
