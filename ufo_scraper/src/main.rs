@@ -55,6 +55,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     println!("Found {} different report pages...", ufo_links.len());
 
+    let mut skip_amount = 0;
     let sleep_milliseconds = generate_sleep_milliseconds();
     println!("Sleeping for {} milliseconds...", sleep_milliseconds);
     task::sleep(Duration::from_millis(sleep_milliseconds)).await;
@@ -62,6 +63,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let sightings = fetch_page_links(link).await?;
         println!("Inserting {} sightings to mongoDb...", sightings.len());
         sightings_collection.insert_many(sightings, None).await?;
+        skip_amount += 1;
+        println!("Currently has ran {} iterations", skip_amount);
         let sleep_milliseconds = generate_sleep_milliseconds();
         println!("Sleeping for {} milliseconds...", sleep_milliseconds);
         task::sleep(Duration::from_millis(sleep_milliseconds)).await;
