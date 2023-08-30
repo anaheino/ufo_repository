@@ -1,4 +1,4 @@
-use scraper::Selector;
+use scraper::{Html, Selector};
 use table_extract::Table;
 use mongodb::{Client, options::{ClientOptions, ResolverConfig}};
 use std::{env, time::Duration};
@@ -19,13 +19,20 @@ struct Sighting {
     shape: String,
     duration: String,
     description: String,
-    report_date: String
+    report_date: String,
+    has_images: bool,
+    link: String
+}
+
+struct AElement {
+    link: String,
+    text: String
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
 
-    let client_uri = env::var("MONGODB_UFO_URI").expect("You must set the MONGODB_URI environment var!");
+    let client_uri =  env::var("MONGODB_UFO_URI").expect("You must set the MONGODB_URI environment var!");
     let client = Client::with_uri_str(client_uri).await?;
     let sightings_collection = client.database("i_want_to_believe").collection::<Sighting>("sightings");
     sightings_collection.delete_many(doc! {}, None).await?;
@@ -56,12 +63,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     for row in &table {
         let row_slice = row.as_slice();
-        let date_link = row_slice.get(0).unwrap_or(&"<a>0/0/70 00:00</a>".to_string()).to_string();
-        let string_array: Vec<_> = date_link.split(">").collect();
-        let start_string = string_array.get(1).unwrap();
-        let date_content: Vec<_> = start_string.split("<").collect();
+        let date_link = row_slice.get(0).unwrap_or(&"<a href=\"no-link-here\">0/0/70 00:00</a>".to_string()).to_string();
+        let a_element: AElement = parse_a_element_link_and_content(&date_link);
         let mut date_time = NaiveDateTime::parse_from_str(
-            &date_content.get(0).unwrap().to_string(),
+            &a_element.text,
             "%m/%d/%Y %R"
         ).unwrap();
         date_time = correct_date(date_time);
@@ -71,6 +76,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
             "%m/%d/%Y"
         ).unwrap().and_hms_opt(0, 0, 0).unwrap();
         report_date_time = correct_date(report_date_time);
+        let full_link = format!("{}{}", "https://nuforc.org/webreports/", a_element.link);
+        let has_images_content = row_slice.get(8).unwrap_or(&"".to_string()).to_string().to_lowercase();
         sightings.push(
           Sighting {
               date: date_time.format("%FT%T").to_string(),
@@ -80,7 +87,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
               shape: row_slice.get(4).unwrap_or(&"Unavailable".to_string()).to_string(),
               duration: row_slice.get(5).unwrap_or(&"Unavailable".to_string()).to_string(),
               description: row_slice.get(6).unwrap_or(&"Unavailable".to_string()).to_string(),
-              report_date: report_date_time.format("%FT%T").to_string()
+              report_date: report_date_time.format("%FT%T").to_string(),
+              has_images: has_images_content.eq("yes"),
+              link: full_link
           });
     }
     sightings_collection.insert_many(sightings, None).await?;
@@ -94,4 +103,14 @@ fn correct_date(mut date_time: NaiveDateTime) -> NaiveDateTime {
         date_time = shift_years(date_time, 2000);
     }
     return date_time;
+}
+
+fn parse_a_element_link_and_content(html_text: &str) -> AElement {
+    let html= Html::parse_fragment(html_text);
+    let sel = Selector::parse("a").unwrap();
+    let link_list: Vec<_> = html.select(&sel).filter_map(|n| n.value().attr("href")).collect();
+    return AElement {
+        text: html.select(&sel).next().unwrap().inner_html(),
+        link: link_list.get(0).unwrap().to_string()
+    };
 }
