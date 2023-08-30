@@ -2564,6 +2564,7 @@ dependencies = [
  "chrono",
  "chronoutil",
  "mongodb",
+ "rand 0.8.5",
  "reqwest",
  "scraper 0.17.1",
  "serde",

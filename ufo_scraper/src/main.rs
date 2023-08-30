@@ -9,6 +9,8 @@ use chrono::{Datelike, NaiveDate, NaiveDateTime};
 use chronoutil::shift_years;
 use tokio;
 use serde::{Serialize, Deserialize};
+use rand::Rng;
+
 
 #[derive(Serialize, Deserialize)]
 struct Sighting {
@@ -32,17 +34,16 @@ struct AElement {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
 
-    let client_uri =  env::var("MONGODB_UFO_URI").expect("You must set the MONGODB_URI environment var!");
+    let client_uri = env::var("MONGODB_UFO_URI").expect("You must set the MONGODB_URI environment var!");
     let client = Client::with_uri_str(client_uri).await?;
     let sightings_collection = client.database("i_want_to_believe").collection::<Sighting>("sightings");
     sightings_collection.delete_many(doc! {}, None).await?;
-    // task::sleep(Duration::from_millis(5000)).await;
-    // Ok(())
 
-    /*let ufo_response = reqwest::blocking::get("https://nuforc.org/webreports/ndxpost.html")
-        .unwrap()
+
+    let ufo_response = reqwest::get("https://nuforc.org/webreports/ndxpost.html")
+        .await?
         .text()
-        .unwrap();
+        .await?;
     let ufo_document = scraper::Html::parse_document(&ufo_response);
     let selector = Selector::parse("a").unwrap();
     let ufo_pages = ufo_document.select(&selector)
@@ -50,9 +51,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let ufo_links = ufo_pages
         .skip(1)
         .map(|x| format!("{}{}", "https://nuforc.org/webreports/", x));
-    ufo_links.for_each(|x| println!("{}", x));*/
+
+    println!("Found {} different report pages...", ufo_links.count());
+
+    let mut sleep_milliseconds = generate_sleep_milliseconds();
+    println!("Sleeping for {} milliseconds...", sleep_milliseconds);
+    task::sleep(Duration::from_millis(sleep_milliseconds)).await;
 
 
+    println!("Fetching current ufo link...");
     let ufo_response = reqwest::get("https://nuforc.org/webreports/ndxp230710.html")
         .await?
         .text()
@@ -92,7 +99,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
               link: full_link
           });
     }
+    println!("Inserting {} sightings to mongoDb...", sightings.len());
     sightings_collection.insert_many(sightings, None).await?;
+    sleep_milliseconds = generate_sleep_milliseconds();
+    println!("Sleeping for {} milliseconds...", sleep_milliseconds);
+    task::sleep(Duration::from_millis(sleep_milliseconds)).await;
+
     Ok(())
 }
 
@@ -103,6 +115,11 @@ fn correct_date(mut date_time: NaiveDateTime) -> NaiveDateTime {
         date_time = shift_years(date_time, 2000);
     }
     return date_time;
+}
+
+fn generate_sleep_milliseconds() -> u64 {
+    let mut rng = rand::thread_rng();
+    return rng.gen_range(1500..3000);
 }
 
 fn parse_a_element_link_and_content(html_text: &str) -> AElement {
