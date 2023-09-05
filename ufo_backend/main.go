@@ -3,7 +3,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -15,7 +14,7 @@ import (
 	"os"
 )
 
-type sighting struct {
+type Sighting struct {
 	ID string `json:"_id"`
 	Date string `json:"date"`
 	City string `json:"city"`
@@ -28,23 +27,20 @@ type sighting struct {
 	HasImages bool `json:"has_images"`
 	Link string `json:"link"`
 }
-var sightings_collection = sighting{}
+var sightingsCollection *mongo.Collection
 
 func getSightings(c *gin.Context) {
-	var result bson.M
-	err := sightings_collection.FindOne(context.TODO(), bson.D{{"city", "Turku"}}).Decode(&result)
-	if err == mongo.ErrNoDocuments {
-		fmt.Printf("No document was found with the title %s\n", "Turku")
+	var results []Sighting
+	cursor, err := sightingsCollection.Find(context.TODO(), bson.D{{"country", "Finland"}})
+	if err != nil {
+		fmt.Printf("No document was found with the title %s\n", "Finland")
 		return
 	}
-	if err != nil {
-		panic(err)
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		fmt.Printf("No document was found with the country %s\n", "Finland")
+		return
 	}
-	jsonData, err := json.MarshalIndent(result, "", "    ")
-	if err != nil {
-		panic(err)
-	}
-	c.IndentedJSON(http.StatusOK, jsonData)
+	c.IndentedJSON(http.StatusOK, results)
 }
 
 func main() {
@@ -64,9 +60,7 @@ func main() {
 			panic(err)
 		}
 	}()
-	sightings_collection = client.Database("i_want_to_believe").Collection("sightings")
-
-
+	sightingsCollection = client.Database("i_want_to_believe").Collection("sightings")
 	router := gin.Default()
 	router.GET("/sightings", getSightings)
 	router.Run("localhost:8080")
