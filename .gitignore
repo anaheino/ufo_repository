@@ -1,2 +1,7 @@
 /ufo_scraper/target
 /ufo_scraper/.idea
+/ufo_frontend/ufo-map/node_modules
+/ufo_geocoder/target
+/ufo_geocoder/.idea
+/ufo_sighting_formatter/target
+/ufo_sighting_formatter/.idea
