@@ -30,6 +30,7 @@ func getSightings(c *gin.Context) {
 		fmt.Printf("No document was found with the country %s\n", "Finland")
 		return
 	}
+	fmt.Printf("%s", results[0].ReportDate)
 	c.IndentedJSON(http.StatusOK, results)
 }
 
