@@ -4,6 +4,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
@@ -26,6 +27,8 @@ type Sighting struct {
 	ReportDate string `json:"report_date"`
 	HasImages bool `json:"has_images"`
 	Link string `json:"link"`
+	Latitude float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
 }
 var sightingsCollection *mongo.Collection
 
@@ -33,6 +36,7 @@ func getSightings(c *gin.Context) {
 	var results []Sighting
 	cursor, err := sightingsCollection.Find(context.TODO(), bson.D{{"country", "Finland"}})
 	if err != nil {
+		fmt.Printf(err.Error())
 		fmt.Printf("No document was found with the title %s\n", "Finland")
 		return
 	}
@@ -60,8 +64,9 @@ func main() {
 			panic(err)
 		}
 	}()
-	sightingsCollection = client.Database("i_want_to_believe").Collection("sightings")
+	sightingsCollection = client.Database("i_want_to_believe").Collection("sightings_with_coords")
 	router := gin.Default()
+	router.Use(cors.Default())
 	router.GET("/sightings", getSightings)
 	router.Run("localhost:8080")
 }
