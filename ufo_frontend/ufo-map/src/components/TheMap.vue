@@ -22,15 +22,27 @@ export default {
       this.data = await response.json();
     },
     addMarkers: function() {
-      this.data.forEach(sighting => {
-        const marker = this.addTooltips(sighting, new L.marker([sighting.latitude, sighting.longitude]));
+      const sightingsByLocation = this.groupBy(this.data, (sighting) => sighting.latitude.toString() + ' ' + sighting.longitude.toString());
+      sightingsByLocation.forEach(multipleSightings => {
+        const marker = this.addTooltips(multipleSightings, new L.marker([multipleSightings[0].latitude, multipleSightings[0].longitude]));
         marker.addTo(this.map);
       });
       this.map.setView([this.data[0].latitude, this.data[0].longitude], 5);
     },
-    addTooltips: function(sighting, marker) {
+    groupBy(array, keyFunc, gimmeDict) {
+      const groupedJsons = array.reduce((result, item) => {
+        const keyValue = keyFunc(item);
+        if (!result[keyValue]) {
+          result[keyValue] = [];
+        }
+        result[keyValue].push(item);
+        return result;
+      }, {});
+      return !gimmeDict ? Object.values(groupedJsons) : groupedJsons;
+    },
+    addTooltips: function(sightings, marker) {
       const mountEl = document.createElement('div');
-      createApp({ extends: PopupContent }, { sighting }).mount(mountEl);
+      createApp({ extends: PopupContent }, { sightings: sightings, itemsPerPage: 1 }).mount(mountEl);
       const myPopupVueEl = new L.popup().setContent(mountEl);
       marker.bindPopup(myPopupVueEl).openPopup();
       return marker;
