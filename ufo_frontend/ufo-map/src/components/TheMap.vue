@@ -5,7 +5,7 @@
 <script lang="ts">
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { createApp, defineComponent, PropType, ref, watch } from 'vue';
+import { createApp, defineComponent, PropType, toRaw, watch } from 'vue';
 import PopupContent from '@/components/PopupContent.vue';
 interface UfoSighting {
   city: string;
@@ -32,7 +32,7 @@ export default defineComponent({
     },
   },
   watch: {
-    sightings(newVal: UfoSighting[], oldVal: UfoSighting[]) {
+    sightings(newVal: UfoSighting[]) {
       if (newVal) {
         this.clearMarkers();
         this.addMarkers(newVal);
@@ -58,7 +58,7 @@ export default defineComponent({
       sightingsByLocation.forEach(multipleSightings => {
         const marker = this.addTooltips(multipleSightings, new L.marker([multipleSightings[0].latitude, multipleSightings[0].longitude]));
         this.markers.push(marker);
-        marker.addTo(this.map);
+        marker.addTo(toRaw(this.map));
       });
       this.map.setView([newVal[0].latitude, newVal[0].longitude], 5);
     },
@@ -81,15 +81,12 @@ export default defineComponent({
       return marker;
     },
   },
-
   async mounted() {
-    this.map = L.map("mapContainer").setView([0, 0], 3);
+    this.map = L.map('mapContainer').setView([0, 0], 3);
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
       attribution:
           '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(this.map);
-    // await this.fetchSightings();
-    // this.addMarkers();
+    }).addTo(toRaw(this.map));
   },
   onBeforeUnmount() {
     if (this.map) {
