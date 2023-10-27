@@ -35,7 +35,9 @@ export default defineComponent({
     sightings(newVal: UfoSighting[]) {
       if (newVal) {
         this.clearMarkers();
-        this.addMarkers(newVal);
+        if (newVal.length) {
+          this.addMarkers(newVal);
+        }
       }
     }
   },
@@ -49,18 +51,28 @@ export default defineComponent({
   methods: {
     clearMarkers: function() {
       if (this.markers && this.markers.length) {
-        this.markers.forEach(marker => this.map.removeLayer(marker));
+        toRaw(this.markers).forEach(marker => toRaw(this.map).removeLayer(marker));
+        this.tooltips = [];
         this.markers = [];
       }
     },
     addMarkers: function(newVal: UfoSighting[]) {
       const sightingsByLocation = this.groupBy(newVal, (sighting) => sighting.latitude.toString() + ' ' + sighting.longitude.toString());
       sightingsByLocation.forEach(multipleSightings => {
-        const marker = this.addTooltips(multipleSightings, new L.marker([multipleSightings[0].latitude, multipleSightings[0].longitude]));
-        this.markers.push(marker);
-        marker.addTo(toRaw(this.map));
+        const marker = new L.marker([multipleSightings[0].latitude, multipleSightings[0].longitude]);
+        const markerWithTooltip = this.addTooltips(multipleSightings, marker);
+        this.markers.push(markerWithTooltip);
+        if (multipleSightings.length > 1) {
+          const tooltip = L.tooltip({ content: `${multipleSightings.length}`, permanent: true, direction: 'top' })
+          marker.bindTooltip(tooltip).openTooltip();
+          markerWithTooltip.on('click', () => markerWithTooltip.getTooltip().setOpacity(0));
+          markerWithTooltip.getPopup().on('remove', () => markerWithTooltip.getTooltip().setOpacity(.9))
+        }
+        markerWithTooltip.addTo(toRaw(this.map));
       });
-      this.map.setView([newVal[0].latitude, newVal[0].longitude], 5);
+      if (newVal?.length) {
+        this.map.setView([newVal[0].latitude, newVal[0].longitude], 5);
+      }
     },
     groupBy(array, keyFunc, gimmeDict?) {
       const groupedJsons = array.reduce((result, item) => {
