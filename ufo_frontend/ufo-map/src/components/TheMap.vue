@@ -48,9 +48,10 @@ export default defineComponent({
   },
   methods: {
     clearMarkers: function() {
-
-      this.markers.forEach(marker => this.map.removeLayer(marker));
-      this.markers = [];
+      if (this.markers && this.markers.length) {
+        this.markers.forEach(marker => this.map.removeLayer(marker));
+        this.markers = [];
+      }
     },
     addMarkers: function(newVal: UfoSighting[]) {
       const sightingsByLocation = this.groupBy(newVal, (sighting) => sighting.latitude.toString() + ' ' + sighting.longitude.toString());
@@ -61,7 +62,7 @@ export default defineComponent({
       });
       this.map.setView([newVal[0].latitude, newVal[0].longitude], 5);
     },
-    groupBy(array, keyFunc, gimmeDict) {
+    groupBy(array, keyFunc, gimmeDict?) {
       const groupedJsons = array.reduce((result, item) => {
         const keyValue = keyFunc(item);
         if (!result[keyValue]) {
