@@ -2,32 +2,64 @@
   <div id="mapContainer"></div>
 </template>
 
-<script>
+<script lang="ts">
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { createApp } from 'vue';
+import { createApp, defineComponent, PropType, ref, watch } from 'vue';
 import PopupContent from '@/components/PopupContent.vue';
+interface UfoSighting {
+  city: string;
+  country: string;
+  date: string;
+  description: string;
+  duration: string;
+  has_images: boolean;
+  latitude: number;
+  link: string;
+  longitude: number;
+  report_date: string;
+  shape: string;
+  state: string;
+  _id: string;
+}
 
-export default {
-  name: 'LeafletMap',
+export default defineComponent({
+
+  props: {
+    sightings: {
+      type: Array as PropType<UfoSighting[]>,
+      required: true,
+    },
+  },
+  watch: {
+    sightings(newVal: UfoSighting[], oldVal: UfoSighting[]) {
+      if (newVal) {
+        this.clearMarkers();
+        this.addMarkers(newVal);
+      }
+    }
+  },
   data() {
     return {
       map: null,
       data: null,
+      markers: [],
     };
   },
   methods: {
-    fetchSightings: async function () {
-      const response = await fetch("http://localhost:8080/sightings");
-      this.data = await response.json();
+    clearMarkers: function() {
+
+      this.markers.forEach(marker => this.map.removeLayer(marker));
+      this.markers = [];
     },
-    addMarkers: function() {
-      const sightingsByLocation = this.groupBy(this.data, (sighting) => sighting.latitude.toString() + ' ' + sighting.longitude.toString());
+    addMarkers: function(newVal: UfoSighting[]) {
+      const sightingsByLocation = this.groupBy(newVal, (sighting) => sighting.latitude.toString() + ' ' + sighting.longitude.toString());
       sightingsByLocation.forEach(multipleSightings => {
         const marker = this.addTooltips(multipleSightings, new L.marker([multipleSightings[0].latitude, multipleSightings[0].longitude]));
+        this.markers.push(marker);
         marker.addTo(this.map);
       });
-      this.map.setView([this.data[0].latitude, this.data[0].longitude], 5);
+      this.map.setView([newVal[0].latitude, newVal[0].longitude], 5);
     },
     groupBy(array, keyFunc, gimmeDict) {
       const groupedJsons = array.reduce((result, item) => {
@@ -55,16 +87,15 @@ export default {
       attribution:
           '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.map);
-    await this.fetchSightings();
-    this.addMarkers();
+    // await this.fetchSightings();
+    // this.addMarkers();
   },
-
   onBeforeUnmount() {
     if (this.map) {
       this.map.remove();
     }
   },
-};
+});
 </script>
 
 <style scoped>

@@ -26,8 +26,12 @@ export default {
     };
   },
   methods: {
-    performSearch() {
-      this.$emit('sighting-search-click', this.searchTerm);
+    async performSearch() {
+      if (this.searchTerm.length > 0) {
+        const response = await fetch(`http://localhost:8080/search?search=${this.searchTerm}`);
+        const sightings = await response.json();
+        this.$emit('sightings-searched', sightings);
+      }
     },
   },
 };
