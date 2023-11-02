@@ -10,6 +10,7 @@
 <script lang="ts">
 import TheMap from '../components/TheMap.vue';
 import Sidebar from '../components/Sidebar.vue';
+import {UfoSighting} from "@/types/types";
 
 export default {
   components: {
