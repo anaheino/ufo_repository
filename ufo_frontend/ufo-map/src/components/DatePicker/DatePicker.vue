@@ -5,12 +5,12 @@
     </div>
     <div class="date-container">
       <div class="date">
-        <v-text-field type="date" label="Start date" v-model="startDate"/>
+        <v-text-field type="date" label="Start date" v-model="startDate" v-on:input="dateChanged"/>
       </div>'
     </div>
     <div class="date-container">
       <div class="date">
-        <v-text-field type="date" label="End date" v-model="endDate"/>
+        <v-text-field type="date" label="End date" v-model="endDate" v-on:input="dateChanged"/>
       </div>
     </div>
   </div>
@@ -19,29 +19,26 @@
 
 <script lang="ts">
 
-import {defineComponent, PropType} from "vue";
-import {UfoSighting} from "@/types/types";
+import { defineComponent } from "vue";
 
 export default defineComponent({
-  props: {
-    startDate: {
-      type: Array as PropType<UfoSighting[]>,
-      required: true,
-    },
-    endDate: {
-      type: Array as PropType<UfoSighting[]>,
-      required: true,
-    },
-  },
   watch: {},
   data() {
     return {
-      map: null,
-      data: null,
-      markers: [],
+      startDate: new Date(0).toISOString().substr(0, 10),
+      endDate: new Date().toISOString().substr(0, 10),
     };
   },
+  methods: {
+    dateChanged() {
+      this.$emit('date-update', {
+        startDate: this.startDate,
+        endDate: this.endDate
+      });
+    }
+  },
 });
+
 </script>
 <style>
   .date {

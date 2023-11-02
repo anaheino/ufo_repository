@@ -5,7 +5,7 @@
       <SearchBar @search-sightings="sightingsSearchedFullText" />
     </v-list-item>
       <v-list-item>
-        <DatePicker :start-date="startDate" :end-date="endDate"></DatePicker>
+        <DatePicker @date-update="datesUpdated"></DatePicker>
       </v-list-item>
     </v-list>
   </div>
@@ -23,8 +23,6 @@ export default {
   },
   data() {
     return {
-      startDate: new Date(0).toISOString().substr(0, 10),
-      endDate: new Date().toISOString().substr(0, 10),
       fullTextSearchResults: [] as UfoSighting[],
     };
   },
@@ -32,6 +30,9 @@ export default {
     sightingsSearchedFullText(sightings) {
       this.fullTextSearchResults = sightings;
       this.$emit('sightings-update', sightings);
+    },
+    datesUpdated(dateObject) {
+      console.log(dateObject);
     }
   }
 };
