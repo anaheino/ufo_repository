@@ -1,5 +1,7 @@
 <template>
+  <v-app>
   <HomeView/>
+  </v-app>
 </template>
 
 <script>

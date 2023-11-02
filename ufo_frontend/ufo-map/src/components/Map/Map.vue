@@ -6,7 +6,8 @@
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { createApp, defineComponent, PropType, toRaw } from 'vue';
-import PopupContent from '@/components/PopupContent.vue';
+import PopupContent from '@/components/Popup/PopupContent.vue';
+import { UfoSighting } from "@/types/types";
 
 export default defineComponent({
 
@@ -84,11 +85,6 @@ export default defineComponent({
       attribution:
           '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(toRaw(this.map));
-  },
-  onBeforeUnmount() {
-    if (this.map) {
-      this.map.remove();
-    }
   },
 });
 </script>

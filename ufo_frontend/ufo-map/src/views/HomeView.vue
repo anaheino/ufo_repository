@@ -1,15 +1,15 @@
 <template>
   <main>
-    <div id="content">
-      <Sidebar @sightings-update="markerUpdate" />
-      <TheMap :sightings="foundSightings"/>
-    </div>
+      <div id="content">
+        <Sidebar @sightings-update="markerUpdate" />
+        <TheMap :sightings="foundSightings"/>
+      </div>
   </main>
 </template>
 
 <script lang="ts">
-import TheMap from '../components/TheMap.vue';
-import Sidebar from '../components/Sidebar.vue';
+import TheMap from '../components/Map/Map.vue';
+import Sidebar from '../components/SideBar/SideBar.vue';
 import {UfoSighting} from "@/types/types";
 
 export default {
