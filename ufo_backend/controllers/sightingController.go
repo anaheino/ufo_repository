@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -19,9 +18,6 @@ var defaultFindOptions *options.FindOptions
 
 func init() {
 	fmt.Printf("Initting")
-	if err:= godotenv.Load();err != nil {
-		log.Println("No .env file")
-	}
 	uri := os.Getenv("MONGODB_UFO_URI")
 	if uri == "" {
 		log.Fatal("Set the Mongodb uri for ufo database!")

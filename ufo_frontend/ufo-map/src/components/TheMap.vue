@@ -95,7 +95,6 @@ export default defineComponent({
 
 <style scoped>
 #mapContainer {
-  margin: 0% 5% 2.5% 5%;
   width: 90vw;
   height: 90vh;
 }

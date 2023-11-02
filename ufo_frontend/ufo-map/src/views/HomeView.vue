@@ -1,17 +1,19 @@
 <template>
   <main>
-    <SearchBar @sightings-searched="sightingsUpdated" />
-    <TheMap :sightings="foundSightings"/>
+    <div id="content">
+      <Sidebar @sightings-update="markerUpdate" />
+      <TheMap :sightings="foundSightings"/>
+    </div>
   </main>
 </template>
 
 <script lang="ts">
 import TheMap from '../components/TheMap.vue';
-import SearchBar from '../components/SearchBar.vue';
+import Sidebar from '../components/Sidebar.vue';
 
 export default {
   components: {
-    SearchBar,
+    Sidebar,
     TheMap,
   },
   data() {
@@ -20,10 +22,15 @@ export default {
     };
   },
   methods: {
-    sightingsUpdated(sightings) {
+    markerUpdate(sightings) {
       this.foundSightings = sightings;
     }
   }
 };
 
 </script>
+<style>
+#content  {
+  display: flex;
+}
+</style>

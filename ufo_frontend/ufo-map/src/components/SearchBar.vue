@@ -32,7 +32,7 @@ export default {
       if (this.searchTerm.length > 0) {
         const response = await fetch(`http://localhost:8080/search?search=${this.searchTerm}`);
         const sightings = await response.json();
-        this.$emit('sightings-searched', sightings);
+        this.$emit('search-sightings', sightings);
       }
     },
   },
@@ -41,8 +41,8 @@ export default {
 
 <style>
 #barcontainer {
-  margin: 5% auto 0%;
-  width: 47.5vw;
+  margin: 0% auto;
+  width: 100%;
   height: auto;
 }
 </style>
