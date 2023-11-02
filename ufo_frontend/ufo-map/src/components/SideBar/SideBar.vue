@@ -32,7 +32,6 @@ export default {
       this.$emit('sightings-update', sightings);
     },
     datesUpdated(dateObject) {
-      console.log(dateObject);
     }
   }
 };
@@ -40,6 +39,6 @@ export default {
 
 <style scoped>
   #sidebar {
-    min-width: 30%;
+    min-width: 40%;
   }
 </style>

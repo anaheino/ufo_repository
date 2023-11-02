@@ -8,11 +8,15 @@ import App from './App.vue';
 import router from './router';
 import 'vuetify/styles';
 import { createVuetify } from 'vuetify';
-import * as components from 'vuetify/components';
+import * as vuetifyComponents from 'vuetify/components';
 import * as directives from 'vuetify/directives';
+import { VDatePicker} from 'vuetify/labs/VDatePicker';
 
 const vuetify = createVuetify({
-    components,
+    components: {
+        ...vuetifyComponents,
+        VDatePicker,
+    },
     directives,
 });
 
