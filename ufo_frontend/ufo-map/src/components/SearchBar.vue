@@ -1,19 +1,21 @@
 <template>
-  <v-card>
-    <v-toolbar
-        dense
-        floating
-    >
-      <v-text-field
-          v-model="searchTerm"
-          hide-details
-          single-line
-      ></v-text-field>
-      <v-btn @click="performSearch" icon>
-        <v-icon>mdi-magnify</v-icon>
-      </v-btn>
-    </v-toolbar>
-  </v-card>
+  <div id="barcontainer">
+    <v-card>
+      <v-toolbar
+          dense
+          floating
+      >
+        <v-text-field
+            v-model="searchTerm"
+            hide-details
+            single-line
+        ></v-text-field>
+        <v-btn @click="performSearch" icon>
+          <v-icon>mdi-magnify</v-icon>
+        </v-btn>
+      </v-toolbar>
+    </v-card>
+  </div>
 </template>
 
 
@@ -36,3 +38,11 @@ export default {
   },
 };
 </script>
+
+<style>
+#barcontainer {
+  margin: 5% auto 0%;
+  width: 47.5vw;
+  height: auto;
+}
+</style>

@@ -5,23 +5,8 @@
 <script lang="ts">
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { createApp, defineComponent, PropType, toRaw, watch } from 'vue';
+import { createApp, defineComponent, PropType, toRaw } from 'vue';
 import PopupContent from '@/components/PopupContent.vue';
-interface UfoSighting {
-  city: string;
-  country: string;
-  date: string;
-  description: string;
-  duration: string;
-  has_images: boolean;
-  latitude: number;
-  link: string;
-  longitude: number;
-  report_date: string;
-  shape: string;
-  state: string;
-  _id: string;
-}
 
 export default defineComponent({
 
@@ -110,7 +95,7 @@ export default defineComponent({
 
 <style scoped>
 #mapContainer {
-  margin: 2.5% 5% 2.5% 5%;
+  margin: 0% 5% 2.5% 5%;
   width: 90vw;
   height: 90vh;
 }
