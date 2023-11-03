@@ -21,7 +21,7 @@
 
 <script lang="ts">
 
-import {defineComponent, PropType} from 'vue';
+import {defineComponent, PropType, toRaw} from 'vue';
 import {SearchTerms} from "@/types/types";
 
 export default defineComponent({
@@ -40,7 +40,7 @@ export default defineComponent({
       if (this.searchTerm.length > 0) {
         const searchTerms = {
           searchTerm: this.searchTerm,
-          dates: this.dates,
+          dates: toRaw(this.dates),
         };
         const searchParams = this.formSearchString(searchTerms);
         const response = await fetch(`http://localhost:8080/search?search=${searchParams}`);
@@ -51,14 +51,13 @@ export default defineComponent({
     formSearchString(searchTerms: SearchTerms) {
       let searchString = `?search=${searchTerms.searchTerm}`;
       if (searchTerms.dates) {
-        if (searchTerms.dates.start) {
-          searchString = searchString.concat(`&startDate=${searchTerms.dates.start}`)
+        if (searchTerms.dates.startDate) {
+          searchString = searchString.concat(`&startDate=${searchTerms.dates.startDate}`)
         }
-        if (searchTerms.dates.end) {
-          searchString = searchString.concat(`&endDate=${searchTerms.dates.end}`)
+        if (searchTerms.dates.endDate) {
+          searchString = searchString.concat(`&endDate=${searchTerms.dates.endDate}`)
         }
       }
-      console.log(searchString)
       return searchString;
     }
   },

@@ -1,24 +1,17 @@
 <template>
   <div>
-    <div class="header">
-      <h4>Filter by date</h4>
+    <div class="date-container">
+      <div class="date">
+        <h5>Start date</h5>
+        <v-text-field type="datetime-local" v-model="startDate" :clearable="true" @update:modelValue="dateChanged"/>
+      </div>
     </div>
     <div class="date-container">
       <div class="date">
-        <v-date-picker
-            :input-mode="'keyboard'"
-            v-model="startDate"
-            @update:modelValue="dateChanged"
-        ></v-date-picker>
-      </div>
-      </div>
-    <div class="date-container">
-      <div class="date">
-        <v-date-picker
-            :input-mode="'keyboard'"
-            v-model="endDate"
-            @update:modelValue="dateChanged"
-        ></v-date-picker>
+        <h5>End date</h5>
+        <div class="date">
+          <v-text-field type="datetime-local" v-model="endDate" :clearable="true" @update:modelValue="dateChanged"/>
+        </div>
       </div>
     </div>
   </div>
@@ -35,7 +28,6 @@ export default defineComponent({
     return {
       startDate: null,
       endDate: null,
-      date: null,
     };
   },
   methods: {
@@ -52,9 +44,5 @@ export default defineComponent({
 <style>
   .date-container {
     margin-left: 5%;
-  }
-  .header {
-    margin-left: 10%;
-    margin-bottom: 2.5%;
   }
 </style>

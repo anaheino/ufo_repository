@@ -18,8 +18,8 @@ export interface DateRange {
     endDate?: Date | null;
 }
 export interface DateRangeString {
-    start?: string;
-    end?: string;
+    startDate?: string;
+    endDate?: string;
 }
 export interface SearchTerms {
     searchTerm: string;

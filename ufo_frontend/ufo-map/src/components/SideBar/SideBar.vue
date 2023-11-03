@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import SearchBar from './SearchBar/SearchBar.vue';
-import { DateRange, UfoSighting } from '@/types/types';
+import { DateRangeString, UfoSighting } from '@/types/types';
 import DatePicker from "@/components/DatePicker/DatePicker.vue";
 
 export default {
@@ -27,8 +27,8 @@ export default {
     return {
       fullTextSearchResults: null | [] as UfoSighting[],
       dates: {
-        start: '',
-        end: '',
+        startDate: '',
+        endDate: '',
       },
     };
   },
@@ -37,10 +37,10 @@ export default {
       this.fullTextSearchResults = sightings;
       this.$emit('sightings-update', sightings);
     },
-    datesUpdated(dateObject: DateRange) {
+    datesUpdated(dateObject: DateRangeString) {
       this.dates = {
-        start: dateObject.startDate?.toISOString() ?? '',
-        end: dateObject.endDate?.toISOString() ?? '',
+        startDate: dateObject.startDate ?? '',
+        endDate: dateObject.endDate ?? '',
       };
     }
   }
