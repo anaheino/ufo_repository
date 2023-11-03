@@ -66,8 +66,7 @@ export default defineComponent({
       const end = (start + this.perPage);
       this.slicedSightings = this.allSightings.slice(start, end);
     },
-    checkboxChanged: function(value: boolean, sighting: UfoSighting) {
-      console.log(sighting);
+    checkboxChanged: function(checked: boolean, sighting: UfoSighting) {
     },
   }
 });
