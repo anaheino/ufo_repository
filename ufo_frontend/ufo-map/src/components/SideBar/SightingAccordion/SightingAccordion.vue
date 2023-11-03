@@ -4,7 +4,7 @@
       <v-container class="bg-surface">
         <v-row no-gutters v-for="(sighting, index) in slicedSightings" :key="index">
           <v-col cols="2" sm="1">
-            <v-checkbox></v-checkbox>
+            <v-checkbox @update:modelValue="checkboxChanged"></v-checkbox>
           </v-col>
           <v-col cols="10" sm="6">
             <v-sheet class="ma-2 pa-2">
@@ -32,7 +32,7 @@
 
 <script lang="ts">
 
-import {defineComponent, toRaw} from 'vue';
+import { defineComponent } from 'vue';
 import { UfoSighting } from '@/types/types';
 
 export default defineComponent({
@@ -54,7 +54,7 @@ export default defineComponent({
     sightings(updatedSightings: UfoSighting[]) {
       this.allSightings = updatedSightings;
       if (updatedSightings.length > 0) {
-        this.paginationLength = Math.ceil(updatedSightings.length / this.perPage);
+        this.paginationLength = Math.round(updatedSightings.length / this.perPage);
       }
       this.slicedSightings = updatedSightings.slice(0, this.perPage);
     }
@@ -65,7 +65,10 @@ export default defineComponent({
       const start = newPage > 1 ?  (newPage - 1) * this.perPage : 0;
       const end = (start + this.perPage);
       this.slicedSightings = this.allSightings.slice(start, end);
-    }
+    },
+    checkboxChanged: function(value) {
+      console.log(value);
+    },
   }
 });
 </script>
