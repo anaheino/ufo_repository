@@ -57,8 +57,12 @@ func SearchSightings(c *gin.Context) {
 	var results []structs.Sighting
 	var sightingsCollection = sightingDatabase.Collection("sightings_with_coords")
 	searchWord := c.DefaultQuery("search", "")
+	startDate := c.DefaultQuery("startDate", "")
+	endDate := c.DefaultQuery("endDate", "")
 	if len(searchWord) > 0 {
-		cursor, err := sightingsCollection.Find(context.TODO(), bson.D{{ "$text", bson.D{{ "$search", searchWord}}}}, defaultFindOptions)
+		fullTextBson := bson.D{{ "$search", searchWord}}
+		searchBson := bson.D{{ "$text", fullTextBson}}
+		cursor, err := sightingsCollection.Find(context.TODO(), searchBson, defaultFindOptions)
 		if err != nil {
 			fmt.Printf(err.Error())
 			fmt.Printf("No document was found with the title %s\n", "Finland")
