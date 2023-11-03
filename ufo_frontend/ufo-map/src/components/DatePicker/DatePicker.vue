@@ -42,7 +42,4 @@ export default defineComponent({
 
 </script>
 <style>
-  .date-container {
-    margin-left: 5%;
-  }
 </style>

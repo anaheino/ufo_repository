@@ -1,14 +1,37 @@
 <template>
-  <div id="sidebar">
-    <v-list>/
-    <v-list-item>
-      <SearchBar @search-sightings="sightingsSearchedFullText"
-                 :dates="dates"
-      />
-    </v-list-item>
-      <v-list-item>
-        <DatePicker @date-update="datesUpdated"></DatePicker>
-      </v-list-item>
+  <div class="sidebar">
+    <v-card>
+      <v-layout>
+        <v-main>
+          <v-list
+              density="compact"
+              nav
+          >
+            <v-list-subheader :class="'sidebar-list-header'">
+              <h2>Ufo Sighting search</h2>
+            </v-list-subheader>
+            <div>
+
+              <v-divider></v-divider>
+
+              <v-list-item :class="'sidebar-list-item'">
+                <h4>Free text search</h4>
+                <SearchBar @search-sightings="sightingsSearchedFullText"
+                           :dates="dates"
+                />
+              </v-list-item>
+              <v-list-item :class="'sidebar-list-item'">
+                <DatePicker @date-update="datesUpdated"></DatePicker>
+              </v-list-item>
+            </div>
+          </v-list>
+
+        </v-main>
+
+      </v-layout>
+    </v-card>
+    <v-list>
+
     </v-list>
   </div>
 </template>
@@ -48,7 +71,16 @@ export default {
 </script>
 
 <style scoped>
-  #sidebar {
-    min-width: 40%;
+  .sidebar {
+    width: 40%;
+    max-width: 750px;
+    min-height: 100%;
+  }
+  .sidebar-list-header {
+    padding-top: 1.5%;
+    font-size-adjust: initial;
+  }
+  .sidebar-list-item {
+    padding: 2.5%;
   }
 </style>
