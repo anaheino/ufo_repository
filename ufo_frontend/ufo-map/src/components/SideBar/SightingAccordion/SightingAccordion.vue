@@ -4,7 +4,7 @@
       <v-container class="bg-surface">
         <v-row no-gutters v-for="(sighting, index) in slicedSightings" :key="index">
           <v-col cols="2" sm="1">
-            <v-checkbox @update:modelValue="checkboxChanged"></v-checkbox>
+            <v-checkbox @update:modelValue="(val) => checkboxChanged(val, sighting)"></v-checkbox>
           </v-col>
           <v-col cols="10" sm="6">
             <v-sheet class="ma-2 pa-2">
@@ -66,8 +66,8 @@ export default defineComponent({
       const end = (start + this.perPage);
       this.slicedSightings = this.allSightings.slice(start, end);
     },
-    checkboxChanged: function(value) {
-      console.log(value);
+    checkboxChanged: function(value: boolean, sighting: UfoSighting) {
+      console.log(sighting);
     },
   }
 });
