@@ -6,6 +6,7 @@
     <div class="date-container">
       <div class="date">
         <v-date-picker
+            :input-mode="'keyboard'"
             v-model="startDate"
             @update:modelValue="dateChanged"
         ></v-date-picker>
@@ -14,7 +15,7 @@
     <div class="date-container">
       <div class="date">
         <v-date-picker
-            :input-mode="keyboard"
+            :input-mode="'keyboard'"
             v-model="endDate"
             @update:modelValue="dateChanged"
         ></v-date-picker>
@@ -26,14 +27,14 @@
 
 <script lang="ts">
 
-import {defineComponent, toRaw} from "vue";
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   watch: {},
   data() {
     return {
-      startDate: new Date(0).toISOString().substr(0, 10),
-      endDate: new Date().toISOString().substr(0, 10),
+      startDate: null,
+      endDate: null,
       date: null,
     };
   },

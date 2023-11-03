@@ -21,7 +21,15 @@
 
 <script lang="ts">
 
-export default {
+import {defineComponent, PropType} from 'vue';
+import {SearchTerms} from "@/types/types";
+
+export default defineComponent({
+  props: {
+    dates: {
+      required: false,
+    }
+  },
   data() {
     return {
       searchTerm: '',
@@ -30,13 +38,31 @@ export default {
   methods: {
     async performSearch() {
       if (this.searchTerm.length > 0) {
-        const response = await fetch(`http://localhost:8080/search?search=${this.searchTerm}`);
+        const searchTerms = {
+          searchTerm: this.searchTerm,
+          dates: this.dates,
+        };
+        const searchParams = this.formSearchString(searchTerms);
+        const response = await fetch(`http://localhost:8080/search?search=${searchParams}`);
         const sightings = await response.json();
         this.$emit('search-sightings', sightings);
       }
     },
+    formSearchString(searchTerms: SearchTerms) {
+      let searchString = `?search=${searchTerms.searchTerm}`;
+      if (searchTerms.dates) {
+        if (searchTerms.dates.start) {
+          searchString = searchString.concat(`&startDate=${searchTerms.dates.start}`)
+        }
+        if (searchTerms.dates.end) {
+          searchString = searchString.concat(`&endDate=${searchTerms.dates.end}`)
+        }
+      }
+      console.log(searchString)
+      return searchString;
+    }
   },
-};
+});
 </script>
 
 <style>

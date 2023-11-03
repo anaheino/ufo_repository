@@ -2,7 +2,9 @@
   <div id="sidebar">
     <v-list>/
     <v-list-item>
-      <SearchBar @search-sightings="sightingsSearchedFullText" />
+      <SearchBar @search-sightings="sightingsSearchedFullText"
+                 :dates="dates"
+      />
     </v-list-item>
       <v-list-item>
         <DatePicker @date-update="datesUpdated"></DatePicker>
@@ -13,7 +15,7 @@
 
 <script lang="ts">
 import SearchBar from './SearchBar/SearchBar.vue';
-import { UfoSighting } from '@/types/types';
+import { DateRange, UfoSighting } from '@/types/types';
 import DatePicker from "@/components/DatePicker/DatePicker.vue";
 
 export default {
@@ -23,7 +25,11 @@ export default {
   },
   data() {
     return {
-      fullTextSearchResults: [] as UfoSighting[],
+      fullTextSearchResults: null | [] as UfoSighting[],
+      dates: {
+        start: '',
+        end: '',
+      },
     };
   },
   methods: {
@@ -31,7 +37,11 @@ export default {
       this.fullTextSearchResults = sightings;
       this.$emit('sightings-update', sightings);
     },
-    datesUpdated(dateObject) {
+    datesUpdated(dateObject: DateRange) {
+      this.dates = {
+        start: dateObject.startDate?.toISOString() ?? '',
+        end: dateObject.endDate?.toISOString() ?? '',
+      };
     }
   }
 };

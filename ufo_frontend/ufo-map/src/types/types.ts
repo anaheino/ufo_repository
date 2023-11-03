@@ -12,4 +12,16 @@ export interface UfoSighting {
     shape: string;
     state: string;
     _id: string;
-};
+}
+export interface DateRange {
+    startDate?: Date | null;
+    endDate?: Date | null;
+}
+export interface DateRangeString {
+    start?: string;
+    end?: string;
+}
+export interface SearchTerms {
+    searchTerm: string;
+    dates?: DateRangeString;
+}
