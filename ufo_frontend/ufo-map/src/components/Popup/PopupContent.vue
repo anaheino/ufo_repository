@@ -1,5 +1,5 @@
 <template>
-  <div v-for="(sighting, index) in sightings" :key="sighting._id">
+  <div v-for="(sighting, index) in sightings" :key="index" :class="'tooltip-container'">
     <div v-if="index === (currentPage - 1)">
       <h1>{{sighting.shape}}</h1>
       <p>{{new Date(sighting.date).toUTCString()}}</p>
@@ -18,9 +18,17 @@
     </div>
   </div>
   <div v-if="totalPages > 1" id="sighting-paginator" style="margin-top: 5%">
-    <button @click="previousPage">Previous</button>
-    <span>Sighting {{ currentPage }} of {{ totalPages }}</span>
-    <button @click="nextPage">Next</button>
+    <div>
+      <span>Sighting {{ currentPage }} of {{ totalPages }}</span>
+    </div>
+    <div :class="'display-flex'">
+      <div :class="'left'">
+        <button @click="previousPage">Previous</button>
+      </div>
+      <div :class="'right'">
+        <button @click="nextPage">Next</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -63,3 +71,8 @@ export default {
   },
 };
 </script>
+<style>
+  .tooltip-container {
+    min-width: 15%;
+  }
+</style>
