@@ -9,7 +9,6 @@ import (
 func main() {
 	router := gin.Default()
 	router.Use(cors.Default())
-	router.GET("/sightings", controllers.GetSightings)
 	router.GET("/search", controllers.SearchSightings)
 	router.Run("localhost:8080")
 }

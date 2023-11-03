@@ -8,12 +8,10 @@
               nav
           >
             <v-list-subheader :class="'sidebar-list-header'">
-              <h2>Ufo Sighting search</h2>
+              <h1>Search options</h1>
             </v-list-subheader>
             <div>
-
-              <v-divider></v-divider>
-
+              <v-divider/>
               <v-list-item :class="'sidebar-list-item top-margin'">
                 <SearchBar @search-sightings="sightingsSearchedFullText"
                            :dates="dates"
@@ -23,6 +21,13 @@
                 <DatePicker @date-update="datesUpdated"></DatePicker>
               </v-list-item>
             </div>
+            <v-list-subheader :class="'sidebar-list-header'">
+              <h1>Search results</h1>
+            </v-list-subheader>
+            <v-divider/>
+            <v-list-item :class="'sidebar-list-item top-margin'">
+              <SightingAccordion :sightings="searchResults"/>
+            </v-list-item>
           </v-list>
 
         </v-main>
@@ -38,16 +43,18 @@
 <script lang="ts">
 import SearchBar from './SearchBar/SearchBar.vue';
 import { DateRangeString, UfoSighting } from '@/types/types';
-import DatePicker from "@/components/DatePicker/DatePicker.vue";
+import DatePicker from '@/components/DatePicker/DatePicker.vue';
+import SightingAccordion from '@/components/SideBar/SightingAccordion/SightingAccordion.vue';
 
 export default {
   components: {
     DatePicker,
     SearchBar,
+    SightingAccordion,
   },
   data() {
     return {
-      fullTextSearchResults: null | [] as UfoSighting[],
+      searchResults: null | [] as UfoSighting[],
       dates: {
         startDate: '',
         endDate: '',
@@ -56,7 +63,7 @@ export default {
   },
   methods: {
     sightingsSearchedFullText(sightings) {
-      this.fullTextSearchResults = sightings;
+      this.searchResults = sightings;
       this.$emit('sightings-update', sightings);
     },
     datesUpdated(dateObject: DateRangeString) {
@@ -72,7 +79,7 @@ export default {
 <style scoped>
   .sidebar {
     width: 40%;
-    max-width: 750px;
+    max-width: 1080px;
     min-height: 100%;
   }
   .sidebar-list-header {

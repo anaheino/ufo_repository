@@ -24,33 +24,15 @@ func init() {
 	}
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
 	if err != nil {
-		panic(err)
+		log.Fatal("Connection failed!")
 	}
 	collation := options.Collation{
 		Locale:   "en",
-		Strength: 2, // 2 for case-insensitive, 1 for case-sensitive
+		Strength: 2,
 	}
 	findOptions := options.Find()
 	findOptions.SetCollation(&collation)
 	sightingDatabase = client.Database("i_want_to_believe")
-}
-
-func GetSightings(c *gin.Context) {
-	var sightingsCollection = sightingDatabase.Collection("sightings_with_coords")
-	var results []structs.Sighting
-
-	cursor, err := sightingsCollection.Find(context.TODO(), bson.D{{"country", "finland"}}, defaultFindOptions)
-	if err != nil {
-		fmt.Printf(err.Error())
-		fmt.Printf("No document was found with the title %s\n", "Finland")
-		return
-	}
-	if err = cursor.All(context.TODO(), &results); err != nil {
-		fmt.Printf("No document was found with the country %s\n", "Finland")
-		return
-	}
-	fmt.Printf("%s", results[0].ReportDate)
-	c.IndentedJSON(http.StatusOK, results)
 }
 
 type SearchTerms struct {

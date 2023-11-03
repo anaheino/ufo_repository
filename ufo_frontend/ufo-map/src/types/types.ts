@@ -13,10 +13,6 @@ export interface UfoSighting {
     state: string;
     _id: string;
 }
-export interface DateRange {
-    startDate?: Date | null;
-    endDate?: Date | null;
-}
 export interface DateRangeString {
     startDate?: string;
     endDate?: string;

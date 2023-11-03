@@ -1,7 +1,7 @@
 package structs
 
 type Sighting struct {
-	ID string `json:"_id"`
+	Id string `json:"_id"`
 	Date string `json:"date"`
 	City string `json:"city"`
 	State string `json:"state"`
