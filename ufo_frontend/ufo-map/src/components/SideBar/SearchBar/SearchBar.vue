@@ -43,13 +43,13 @@ export default defineComponent({
           dates: toRaw(this.dates),
         };
         const searchParams = this.formSearchString(searchTerms);
-        const response = await fetch(`http://localhost:8080/search?search=${searchParams}`);
+        const response = await fetch(`http://localhost:8080/search?searchTerm=${searchParams}`);
         const sightings = await response.json();
         this.$emit('search-sightings', sightings);
       }
     },
     formSearchString(searchTerms: SearchTerms) {
-      let searchString = `?search=${searchTerms.searchTerm}`;
+      let searchString = `${searchTerms.searchTerm}`;
       if (searchTerms.dates) {
         if (searchTerms.dates.startDate) {
           searchString = searchString.concat(`&startDate=${searchTerms.dates.startDate}`)

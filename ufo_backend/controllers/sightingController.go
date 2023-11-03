@@ -56,9 +56,9 @@ func GetSightings(c *gin.Context) {
 func SearchSightings(c *gin.Context) {
 	var results []structs.Sighting
 	var sightingsCollection = sightingDatabase.Collection("sightings_with_coords")
-	searchWord := c.DefaultQuery("search", "")
-	startDate := c.DefaultQuery("startDate", "")
-	endDate := c.DefaultQuery("endDate", "")
+	searchWord := c.DefaultQuery("searchTerm", "")
+	// startDate := c.DefaultQuery("startDate", "")
+	// endDate := c.DefaultQuery("endDate", "")
 	if len(searchWord) > 0 {
 		fullTextBson := bson.D{{ "$search", searchWord}}
 		searchBson := bson.D{{ "$text", fullTextBson}}
