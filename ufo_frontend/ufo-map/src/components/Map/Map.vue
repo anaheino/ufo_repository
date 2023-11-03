@@ -7,7 +7,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { createApp, defineComponent, PropType, toRaw } from 'vue';
 import PopupContent from '@/components/Popup/PopupContent.vue';
-import { UfoSighting } from "@/types/types";
+import { UfoSighting, CoordPair } from "@/types/types";
 
 export default defineComponent({
 
@@ -44,6 +44,7 @@ export default defineComponent({
     },
     addMarkers: function(newVal: UfoSighting[]) {
       const sightingsByLocation = this.groupBy(newVal, (sighting) => sighting.latitude.toString() + ' ' + sighting.longitude.toString());
+      const defaultCoords = this.findMaxAmountOfSightings(sightingsByLocation);
       sightingsByLocation.forEach(multipleSightings => {
         const marker = new L.marker([multipleSightings[0].latitude, multipleSightings[0].longitude]);
         const markerWithTooltip = this.addTooltips(multipleSightings, marker);
@@ -57,7 +58,7 @@ export default defineComponent({
         markerWithTooltip.addTo(toRaw(this.map));
       });
       if (newVal?.length) {
-        this.map.setView([newVal[0].latitude, newVal[0].longitude], 5);
+        this.map.setView([defaultCoords.latitude, defaultCoords.longitude], 8);
       }
     },
     groupBy(array, keyFunc, gimmeDict?) {
@@ -78,6 +79,20 @@ export default defineComponent({
       marker.bindPopup(myPopupVueEl).openPopup();
       return marker;
     },
+    findMaxAmountOfSightings: function(sightingsByLocation): CoordPair {
+      let zoomedCords: CoordPair = { latitude: 0, longitude: 0 };
+      sightingsByLocation.reduce((max, current) => {
+        if (current.length > max) {
+          max = current.length;
+          zoomedCords = {
+            latitude: current[0].latitude,
+            longitude: current[0].longitude,
+          }
+        }
+        return max;
+      }, 0);
+      return zoomedCords;
+    }
   },
   async mounted() {
     this.map = L.map('mapContainer').setView([0, 0], 3);

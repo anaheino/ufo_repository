@@ -25,3 +25,7 @@ export interface SearchTerms {
     searchTerm: string;
     dates?: DateRangeString;
 }
+export interface CoordPair {
+    latitude: number;
+    longitude: number;
+}

@@ -1,5 +1,6 @@
 <template>
   <div id="barcontainer">
+    <h2>Free text search</h2>
     <v-card>
       <v-toolbar
           dense

@@ -1,5 +1,9 @@
 <template>
   <div>
+    <div :class="'date-header'">
+      <h2>Filter by report date</h2>
+      <v-divider></v-divider>
+    </div>
     <div class="date-container">
       <div class="date">
         <h5>Start date</h5>
@@ -42,4 +46,7 @@ export default defineComponent({
 
 </script>
 <style>
+.date-header {
+  margin-bottom: 5%;
+}
 </style>

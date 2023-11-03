@@ -14,8 +14,7 @@
 
               <v-divider></v-divider>
 
-              <v-list-item :class="'sidebar-list-item'">
-                <h4>Free text search</h4>
+              <v-list-item :class="'sidebar-list-item top-margin'">
                 <SearchBar @search-sightings="sightingsSearchedFullText"
                            :dates="dates"
                 />
@@ -79,8 +78,12 @@ export default {
   .sidebar-list-header {
     padding-top: 1.5%;
     font-size-adjust: initial;
+    padding-bottom: 5%;
   }
   .sidebar-list-item {
     padding: 2.5%;
+  }
+  .top-margin {
+    margin-top:5%;
   }
 </style>
