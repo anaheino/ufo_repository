@@ -66,7 +66,7 @@ export default {
   },
   methods: {
     sightingsSearchedFullText(sightings) {
-      this.searchResults = sightings;
+      this.searchResults = sightings ?? [];
       this.$emit('sightings-update', sightings);
     },
     datesUpdated(dateObject: DateRangeString) {

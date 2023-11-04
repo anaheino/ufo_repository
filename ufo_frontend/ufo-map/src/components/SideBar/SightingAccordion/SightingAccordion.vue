@@ -21,7 +21,7 @@
         </v-col>
       </v-row>
       <v-row>
-        <p>Showing {{start}} to {{end}} of {{allSightings.length}}</p>
+        <p>Showing {{start }} to {{end}} of {{allSightings?.length ?? 0}}</p>
       </v-row>
       <v-pagination v-if="paginationLength > 0"
                     :length="paginationLength"
@@ -59,9 +59,7 @@ export default defineComponent({
   watch: {
     sightings(updatedSightings: UfoSighting[]) {
       this.allSightings = updatedSightings;
-      if (updatedSightings?.length > 0) {
-        this.paginationLength = Math.ceil(updatedSightings.length / this.perPage);
-      }
+      this.paginationLength = updatedSightings?.length > 0 ? Math.ceil(updatedSightings.length / this.perPage) : 0;
       this.slicedSightings = updatedSightings?.slice(0, this.perPage) ?? [];
     }
   },
