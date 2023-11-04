@@ -59,10 +59,10 @@ export default defineComponent({
   watch: {
     sightings(updatedSightings: UfoSighting[]) {
       this.allSightings = updatedSightings;
-      if (updatedSightings.length > 0) {
+      if (updatedSightings?.length > 0) {
         this.paginationLength = Math.ceil(updatedSightings.length / this.perPage);
       }
-      this.slicedSightings = updatedSightings.slice(0, this.perPage);
+      this.slicedSightings = updatedSightings?.slice(0, this.perPage) ?? [];
     }
   },
   methods: {

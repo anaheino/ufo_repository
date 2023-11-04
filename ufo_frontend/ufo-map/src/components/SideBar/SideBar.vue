@@ -3,6 +3,7 @@
     <v-card>
       <v-layout>
         <v-main>
+          <div>
           <v-list
               density="compact"
               nav
@@ -10,7 +11,7 @@
             <v-list-subheader :class="'sidebar-list-header'">
               <h1>Search options</h1>
             </v-list-subheader>
-            <div>
+            <div :class="'search-options'">
               <v-divider/>
               <v-list-item :class="'sidebar-list-item top-margin'">
                 <SearchBar @search-sightings="sightingsSearchedFullText"
@@ -21,6 +22,7 @@
                 <DatePicker @date-update="datesUpdated"></DatePicker>
               </v-list-item>
             </div>
+            <div :class="'search-results'">
             <v-list-subheader :class="'sidebar-list-header'">
               <h1>Search results</h1>
             </v-list-subheader>
@@ -28,8 +30,9 @@
             <v-list-item :class="'sidebar-list-item top-margin'">
               <SightingAccordion :sightings="searchResults"/>
             </v-list-item>
+            </div>
           </v-list>
-
+          </div>
         </v-main>
 
       </v-layout>
@@ -91,5 +94,11 @@ export default {
   }
   .top-margin {
     margin-top: 2.5%;
+  }
+  .search-results {
+    max-height: 63vh;
+  }
+  .search-options {
+    min-height: 18vh;
   }
 </style>
