@@ -1,18 +1,18 @@
 <template>
   <div>
     <div :class="'date-header'">
-      <h2>Filter by report date</h2>
+      <h3>Filter by report date</h3>
       <v-divider></v-divider>
     </div>
     <div class="date-container">
       <div class="date">
-        <h5>Start date</h5>
+        Start date
         <v-text-field type="datetime-local" v-model="startDate" :clearable="true" @update:modelValue="dateChanged"/>
       </div>
     </div>
     <div class="date-container">
       <div class="date">
-        <h5>End date</h5>
+        End date
         <div class="date">
           <v-text-field type="datetime-local" v-model="endDate" :clearable="true" @update:modelValue="dateChanged"/>
         </div>

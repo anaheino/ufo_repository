@@ -80,17 +80,16 @@ export default {
   .sidebar {
     width: 40%;
     max-width: 1080px;
-    min-height: 100%;
+    height: 5%;
+
   }
   .sidebar-list-header {
-    padding-top: 1.5%;
     font-size-adjust: initial;
-    padding-bottom: 5%;
   }
   .sidebar-list-item {
-    padding: 2.5%;
+    padding: 0.5%;
   }
   .top-margin {
-    margin-top:5%;
+    margin-top: 2.5%;
   }
 </style>
