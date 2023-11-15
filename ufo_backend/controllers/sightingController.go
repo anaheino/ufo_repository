@@ -36,23 +36,24 @@ func init() {
 }
 
 type SearchTerms struct {
-	SearchTerm  bson.M `bson:"$search,omitempty"`
-	StartDate   string    `bson:"startDate,omitempty"`
-	EndDate string `bson:"endDate,omitempty"`
+	SearchTerm bson.M `bson:"$search,omitempty"`
+	StartDate  string `bson:"startDate,omitempty"`
+	EndDate    string `bson:"endDate,omitempty"`
 }
+
 func SearchSightings(c *gin.Context) {
 	var results []structs.Sighting
 	var sightingsCollection = sightingDatabase.Collection("sightings_with_coords")
 	startDate := c.DefaultQuery("startDate", "")
 	endDate := c.DefaultQuery("endDate", "")
 	searchTerm := c.DefaultQuery("searchTerm", "")
-	searchBson := bson.D{{ "$text", bson.D{{ "$search", searchTerm}}}}
+	searchBson := bson.D{{"$text", bson.D{{"$search", searchTerm}}}}
 	dateFilter := bson.M{}
 
 	if len(startDate) > 0 {
 		dateFilter["$gte"] = startDate
 	}
-    if len(endDate) > 0 {
+	if len(endDate) > 0 {
 		dateFilter["$lte"] = endDate
 	}
 	if len(startDate) > 0 || len(endDate) > 0 {
