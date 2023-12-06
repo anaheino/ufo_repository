@@ -17,7 +17,7 @@ var sightingDatabase *mongo.Database
 var defaultFindOptions *options.FindOptions
 
 func init() {
-	fmt.Printf("Initting")
+	fmt.Println("Initting")
 	uri := os.Getenv("MONGODB_UFO_URI")
 	if uri == "" {
 		log.Fatal("Set the Mongodb uri for ufo database!")
@@ -41,7 +41,13 @@ type SearchTerms struct {
 	EndDate    string `bson:"endDate,omitempty"`
 }
 
+func TestEndpoint(c *gin.Context) {
+	c.IndentedJSON(http.StatusOK, bson.D{{"its", "working"}})
+}
+
 func SearchSightings(c *gin.Context) {
+	fmt.Println("Trying to get database connection")
+
 	var results []structs.Sighting
 	var sightingsCollection = sightingDatabase.Collection("sightings_with_coords")
 	startDate := c.DefaultQuery("startDate", "")
@@ -59,6 +65,7 @@ func SearchSightings(c *gin.Context) {
 	if len(startDate) > 0 || len(endDate) > 0 {
 		searchBson = append(searchBson, bson.E{Key: "report_date", Value: dateFilter})
 	}
+
 	cursor, err := sightingsCollection.Find(context.TODO(), searchBson, defaultFindOptions)
 	if err != nil {
 		fmt.Printf(err.Error())
