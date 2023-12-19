@@ -24,6 +24,7 @@ func init() {
 	}
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
 	if err != nil {
+		fmt.Printf(uri)
 		log.Fatal("Connection failed!")
 	}
 	collation := options.Collation{

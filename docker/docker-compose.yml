@@ -1,6 +1,16 @@
 version: '3.8'
 services:
   ufobackend:
+    container_name: ufo_backend
     build: '../ufo_backend'
     ports:
       - "8080:8080"
+    environment:
+      - MONGODB_UFO_URI=mongodb://rust-scraper:iwanttobelieve@172.17.0.1:27017/i_want_to_believe?retryWrites=true&w=majority&authSource=admin
+      - localhost=0.0.0.0
+  ufomap:
+    container_name: ufo_map
+    build: '../ufo_frontend/ufo-map'
+    ports:
+      - "5173:5173"
+
