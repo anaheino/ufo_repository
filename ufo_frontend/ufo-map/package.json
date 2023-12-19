@@ -9,6 +9,7 @@
     "lint": "vue-cli-service lint",
     "build-only": "vite build",
     "dev": "vite",
+    "host": "vite --host 0.0.0.0",
     "format": "prettier --write src/",
     "preview": "vite preview",
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false"
