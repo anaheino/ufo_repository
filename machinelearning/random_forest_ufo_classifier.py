@@ -7,11 +7,9 @@ import json
 
 with open('sighting_dataset.json', 'r') as file:
     ufo_data = pd.DataFrame(json.load(file))
-# Assuming your dataframe is called 'df'
 X = ufo_data[['latitude', 'longitude']]
 y = ufo_data['sighting']
 
-# Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Initialize the Random Forest classifier
