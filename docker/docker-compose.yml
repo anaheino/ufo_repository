@@ -13,4 +13,9 @@ services:
     build: '../ufo_frontend/ufo-map'
     ports:
       - "5173:5173"
+  ufodb:
+    container_name: ufo_db
+    build: '../mongo'
+    ports:
+      - "27017:27017"
 
