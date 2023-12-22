@@ -2,10 +2,10 @@ import pickle
 import json
 import numpy as np
 
-with open('random_forest_model.pkl', 'rb') as file:
+with open('random_forest/random_forest_model.pkl', 'rb') as file:
     loaded_model = pickle.load(file)
 
-json_data_to_test = '{"latitude": 51.52282, "longitude": -1.128462}'
+json_data_to_test = '{"latitude": 88.52282, "longitude": -17.128462}'
 data_dict = json.loads(json_data_to_test)
 features_to_test = [data_dict['latitude'], data_dict['longitude']]
 
