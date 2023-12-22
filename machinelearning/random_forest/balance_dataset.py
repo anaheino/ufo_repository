@@ -12,8 +12,8 @@ ufo_data[['latitude', 'longitude']] = ufo_data[['latitude', 'longitude']].apply(
 )
 print(ufo_data.iloc[0])
 random_coordinates = pd.DataFrame({
-    'latitude': [random.uniform(-90.0000, 90.0000) for _ in range(num_random_coordinates)],
-    'longitude': [random.uniform(-180.0000, 180.0000) for _ in range(num_random_coordinates)],
+    'latitude': [round(random.uniform(-90.0000, 90.0000), 4) for _ in range(num_random_coordinates)],
+    'longitude': [round(random.uniform(-180.0000, 180.0000), 4) for _ in range(num_random_coordinates)],
 })
 
 merged_df = pd.merge(ufo_data, random_coordinates, on=['latitude', 'longitude'], how='outer', indicator=True)
