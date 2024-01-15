@@ -21,29 +21,6 @@ Additional semi-interesting implementations and technologies in this project are
 The python is still a very-much work in progress, but the idea will be to create a separate REST API with it's own docker container, that can call .pkl files (machine learning models) trained with this data.
 Currently I've trained a random forest -classifier to provide me with a probability of a ufo sighting when it's given coordinates.
 
-## Split into multiple folders by their purpose:
-
-This can help you easily navigate the project structure.
-
-## rust
-
-- Contains web-scraper and all other data formatting and handling implemented in Rust for parsing sightings to mongoDB
-
-## mongo
-- Contains basic mongoDB configurations
-
-## ufo_backend
-
-- contains REST-service that uses MongoDb driver, and offers REST API implemented in golang and gin framework.
-
-## ufo_frontend
-
-- Contains a Vue3 frontend, that communicates with the ufo_backend.
-
-## deeplearning
-
-- Still a work in progress, but will contain all the python code used to create ML models from sighting data.
-
 ## Other notes
 
 Please note that this is very much a hobby project, and thus doesn't contain many things a real-life application would, such as proper tests.
