@@ -5,3 +5,10 @@
 /rust/ufo_sighting_formatter/target
 /rust/ufo_sighting_formatter/.idea
 /ufo_frontend/ufo-map/node_modules
+/machinelearning/older_random_forest/ufo_coordinates.json
+/machinelearning/older_random_forest/sighting_dataset.json
+/machinelearning/random_forest/ufo_coordinates.json
+/machinelearning/older_random_forest/random_forest_model.pkl
+/machinelearning/random_forest/sighting_dataset.json
+/machinelearning/random_forest/random_forest_model.pkl
+/flask_app/src/models/random_forest_model.pkl

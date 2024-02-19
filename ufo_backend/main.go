@@ -13,7 +13,7 @@ func main() {
 	router.Use(corsMiddleware())
 	router.GET("/search", controllers.SearchSightings)
 	router.GET("/test", controllers.TestEndpoint)
-
+	router.POST("/probability", controllers.RandomForestForCoordinates)
 	uri := fmt.Sprintf("%s:8080", os.Getenv("localhost"))
 	fmt.Printf(uri)
 	router.Run(uri)
