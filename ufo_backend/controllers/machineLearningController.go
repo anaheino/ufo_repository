@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"io"
 	"net/http"
 	"ufo_backend/structs"
 )
@@ -14,7 +15,6 @@ var randomForestURL = pythonBackEndURL + "/coordinates/likelihood"
 
 func RandomForestForCoordinates(c *gin.Context) {
 	fmt.Println("Trying to get a probability")
-
 	var coordinates structs.Coordinates
 	if err := c.ShouldBindJSON(&coordinates); err != nil {
 		c.JSON(400, gin.H{"error": "Invalid JSON format"})
@@ -22,7 +22,6 @@ func RandomForestForCoordinates(c *gin.Context) {
 	}
 	jsonData, err := json.Marshal(coordinates)
 	client := &http.Client{}
-	fmt.Println(jsonData)
 	req, err := http.NewRequest("POST", randomForestURL, bytes.NewBuffer(jsonData))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -39,14 +38,12 @@ func RandomForestForCoordinates(c *gin.Context) {
 		c.JSON(http.StatusBadGateway, gin.H{"error": fmt.Sprintf("External service returned status code %d", resp.StatusCode)})
 		return
 	}
-	fmt.Println("trying")
+	jsonData, err = io.ReadAll(resp.Body)
 	var requestBody structs.Probability
-	if err := c.ShouldBindJSON(&requestBody); err != nil {
+	if err := json.Unmarshal(jsonData, &requestBody); err != nil {
 		c.JSON(400, gin.H{"error": "Invalid JSON format"})
 		return
 	}
-	fmt.Println("proba")
-	fmt.Println(requestBody.Probability)
 	response := structs.CoordinatesProbability{
 		Coordinates: structs.Coordinates{
 			Latitude:  coordinates.Latitude,
@@ -54,6 +51,5 @@ func RandomForestForCoordinates(c *gin.Context) {
 		},
 		Probability: requestBody,
 	}
-	fmt.Println(response)
 	c.JSON(http.StatusOK, response)
 }
