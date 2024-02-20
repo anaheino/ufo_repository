@@ -43,7 +43,7 @@ export default defineComponent({
       }
     },
     addMarkers: function(newVal: UfoSighting[]) {
-      const sightingsByLocation = this.groupBy(newVal, (sighting) => sighting.latitude.toString() + ' ' + sighting.longitude.toString());
+      const sightingsByLocation = this.groupBy(newVal, (sighting) => sighting?.latitude?.toString() + ' ' + sighting?.longitude?.toString());
       const defaultCoords = this.findMaxAmountOfSightings(sightingsByLocation);
       sightingsByLocation.forEach(multipleSightings => {
         const marker = new L.marker([multipleSightings[0].latitude, multipleSightings[0].longitude]);
