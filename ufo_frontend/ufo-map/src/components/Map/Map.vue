@@ -92,7 +92,29 @@ export default defineComponent({
         return max;
       }, 0);
       return zoomedCords;
-    }
+    },
+    async getProbability(latitude, longitude) {
+      let requestData = {
+        'latitude':latitude,
+        'longitude': longitude
+      };
+      try {
+        const response = await fetch(`http://localhost:8080/probability`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestData),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log(data);
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    },
   },
   async mounted() {
     this.map = L.map('mapContainer').setView([0, 0], 3);
@@ -100,6 +122,7 @@ export default defineComponent({
       attribution:
           '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(toRaw(this.map));
+    this.map.on('click', (e) => this.getProbability(e.latlng.lat.toFixed(4), e.latlng.lng.toFixed(4)));
   },
 });
 </script>
