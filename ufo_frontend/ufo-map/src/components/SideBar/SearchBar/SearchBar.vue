@@ -34,6 +34,8 @@ export default defineComponent({
   data() {
     return {
       searchTerm: '',
+      probability: null,
+      probabilityCoords: {},
     };
   },
   methods: {
@@ -60,6 +62,18 @@ export default defineComponent({
         }
       }
       return searchString;
+    },
+    async getProbability() {
+      if (this.probabilityCoords) {
+        const searchTerms = {
+          searchTerm: this.searchTerm,
+          dates: toRaw(this.dates),
+        };
+        const searchParams = this.formSearchString(searchTerms);
+        const response = await fetch(`http://localhost:8080/search?searchTerm=${searchParams}`);
+        const sightings = await response.json();
+        this.$emit('search-sightings', sightings);
+      }
     }
   },
 });

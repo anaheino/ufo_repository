@@ -5,7 +5,7 @@ import numpy as np
 
 app = Flask(__name__)
 
-with open('./models/random_forest_model.pkl', 'rb') as file:
+with open('models/random_forest_model.pkl', 'rb') as file:
     random_forest = pickle.load(file)
 
 @app.route('/api/data', methods=['GET'])
@@ -28,4 +28,4 @@ def run_coords_through_random_forest():
     return "Wrong format, couldn't find latitude and longitude from body"
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)

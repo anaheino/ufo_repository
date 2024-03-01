@@ -10,7 +10,7 @@
 <script lang="ts">
 import Map from '../components/Map/Map.vue';
 import Sidebar from '../components/SideBar/SideBar.vue';
-import { UfoSighting } from '@/types/types';
+import type { UfoSighting } from '@/types/types';
 
 export default {
   components: {
@@ -23,7 +23,7 @@ export default {
     };
   },
   methods: {
-    markerUpdate(sightings) {
+    markerUpdate(sightings: UfoSighting[]) {
       if (!sightings) {
         this.foundSightings = [];
       } else {

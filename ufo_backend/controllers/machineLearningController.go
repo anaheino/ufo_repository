@@ -7,14 +7,23 @@ import (
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
+	"os"
 	"ufo_backend/structs"
 )
 
-var pythonBackEndURL = "http://localhost:5000"
-var randomForestURL = pythonBackEndURL + "/coordinates/likelihood"
+var randomForestURL = ""
+
+func init() {
+	pythonBackEndURL := fmt.Sprintf("%s", os.Getenv("MACHINE_LEARNING_URI"))
+	if pythonBackEndURL == "" {
+		pythonBackEndURL = "http://localhost:5000"
+	}
+	randomForestURL = pythonBackEndURL + "/coordinates/likelihood"
+}
 
 func RandomForestForCoordinates(c *gin.Context) {
 	fmt.Println("Trying to get a probability")
+	fmt.Println(randomForestURL)
 	var coordinates structs.Coordinates
 	if err := c.ShouldBindJSON(&coordinates); err != nil {
 		c.JSON(400, gin.H{"error": "Invalid JSON format"})
