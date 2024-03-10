@@ -8,6 +8,8 @@ import L from 'leaflet';
 import { createApp, defineComponent, PropType, toRaw } from 'vue';
 import PopupContent from '@/components/Popup/PopupContent.vue';
 import { UfoSighting, CoordPair } from "@/types/types";
+import PopupCoordinates from "@/components/Popup/PopupCoordinates.vue";
+import {th} from "vuetify/locale";
 
 export default defineComponent({
 
@@ -32,7 +34,13 @@ export default defineComponent({
       map: null,
       data: null,
       markers: [],
+      popUpText: 'default value',
     };
+  },
+  computed: {
+    popupContent() {
+      return `<div>${this.popUpText}</div>`;
+    },
   },
   methods: {
     clearMarkers: function() {
@@ -93,7 +101,7 @@ export default defineComponent({
       }, 0);
       return zoomedCords;
     },
-    async getProbability(latitude, longitude) {
+    async getProbability(latitude: string, longitude: string) {
       let requestData = {
         'latitude':latitude,
         'longitude': longitude
@@ -110,7 +118,18 @@ export default defineComponent({
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
-        console.log(data);
+        this.popUpText = data.probability;
+        const popupOptions = {
+          content: this.popupContent,
+          popupOptions: {
+            permanent: true,
+            direction: 'center',
+          },
+          className: 'red-tooltip',
+        };
+        L.popup(popupOptions)
+            .setLatLng([data.latitude, data.longitude])
+            .openOn(toRaw(this.map));
       } catch (error) {
         console.error('Error:', error);
       }
@@ -127,8 +146,16 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-
+<style>
+.red-tooltip {
+  width: 6vw;
+  padding: 0px;
+  .leaflet-popup-content-wrapper {
+    .leaflet-popup-content {
+      font-weight: bold;
+    }
+  }
+}
 
 #mapContainer {
   width: 90vw;

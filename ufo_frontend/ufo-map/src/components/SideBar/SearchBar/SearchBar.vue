@@ -22,8 +22,8 @@
 
 <script lang="ts">
 
-import {defineComponent, PropType, toRaw} from 'vue';
-import {SearchTerms} from "@/types/types";
+import {defineComponent, toRaw} from 'vue';
+import type {DateRangeString, SearchTerms} from "@/types/types";
 
 export default defineComponent({
   props: {
@@ -39,9 +39,9 @@ export default defineComponent({
   methods: {
     async performSearch() {
       if (this.searchTerm.length > 0) {
-        const searchTerms = {
+        const searchTerms: SearchTerms = {
           searchTerm: this.searchTerm,
-          dates: toRaw(this.dates),
+          dates: toRaw(this.dates) as DateRangeString,
         };
         const searchParams = this.formSearchString(searchTerms);
         const response = await fetch(`http://localhost:8080/search?searchTerm=${searchParams}`);
