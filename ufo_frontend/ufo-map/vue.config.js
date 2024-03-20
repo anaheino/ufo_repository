@@ -5,10 +5,5 @@ module.exports = defineConfig({
     host: '0.0.0.0',
     port: 5173,
     disableHostCheck: true,
-  },
-  server: {
-    host: '0.0.0.0',
-    port: 5173,
-    disableHostCheck: true,
-  },
+  }
 })
