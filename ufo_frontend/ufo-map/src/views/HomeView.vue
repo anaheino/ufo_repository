@@ -2,20 +2,20 @@
   <main>
       <div id="content">
         <Sidebar @sightings-update="markerUpdate" />
-        <Map :sightings="foundSightings"/>
+        <SightingMap :sightings="foundSightings"/>
       </div>
   </main>
 </template>
 
 <script lang="ts">
-import Map from '../components/Map/Map.vue';
+import SightingMap from '@/components/SightingMap/SightingMap.vue';
 import Sidebar from '../components/SideBar/SideBar.vue';
 import type { UfoSighting } from '@/types/types';
 
 export default {
   components: {
     Sidebar,
-    Map,
+    SightingMap,
   },
   data() {
     return {

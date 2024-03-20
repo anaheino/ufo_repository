@@ -8,8 +8,6 @@ import L from 'leaflet';
 import { createApp, defineComponent, PropType, toRaw } from 'vue';
 import PopupContent from '@/components/Popup/PopupContent.vue';
 import { UfoSighting, CoordPair } from "@/types/types";
-import PopupCoordinates from "@/components/Popup/PopupCoordinates.vue";
-import {th} from "vuetify/locale";
 
 export default defineComponent({
 
