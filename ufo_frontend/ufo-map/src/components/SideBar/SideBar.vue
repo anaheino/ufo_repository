@@ -45,7 +45,7 @@
 
 <script lang="ts">
 import SearchBar from './SearchBar/SearchBar.vue';
-import { DateRangeString, UfoSighting } from '@/types/types';
+import type { DateRangeString, UfoSighting } from '@/types/types';
 import DatePicker from '@/components/DatePicker/DatePicker.vue';
 import SightingAccordion from '@/components/SideBar/SightingAccordion/SightingAccordion.vue';
 
@@ -57,7 +57,7 @@ export default {
   },
   data() {
     return {
-      searchResults: null | [] as UfoSighting[],
+      searchResults: [] as UfoSighting[],
       dates: {
         startDate: '',
         endDate: '',
@@ -65,7 +65,7 @@ export default {
     };
   },
   methods: {
-    sightingsSearchedFullText(sightings) {
+    sightingsSearchedFullText(sightings: UfoSighting[]) {
       this.searchResults = sightings ?? [];
       this.$emit('sightings-update', sightings);
     },

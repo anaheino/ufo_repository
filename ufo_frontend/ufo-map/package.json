@@ -4,10 +4,9 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "vite build",
     "test:unit": "vitest",
     "lint": "vue-cli-service lint",
-    "build-only": "vite build",
     "dev": "vite",
     "host": "vite --host 0.0.0.0",
     "format": "prettier --write src/",

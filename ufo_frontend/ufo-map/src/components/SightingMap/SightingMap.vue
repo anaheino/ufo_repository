@@ -5,9 +5,10 @@
 <script lang="ts">
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { createApp, defineComponent, PropType, toRaw } from 'vue';
+import { createApp, defineComponent, toRaw } from 'vue';
+import type { PropType } from 'vue';
 import PopupContent from '@/components/Popup/PopupContent.vue';
-import { UfoSighting, CoordPair } from "@/types/types";
+import type { UfoSighting, CoordPair } from "@/types/types";
 
 export default defineComponent({
 
@@ -29,10 +30,11 @@ export default defineComponent({
   },
   data() {
     return {
-      map: null,
+      map: {} as L.Map,
       data: null,
-      markers: [],
+      markers: [] as L.Marker[],
       popUpText: 'default value',
+      tooltips: [] as L.Tooltip[],
     };
   },
   computed: {
@@ -48,18 +50,18 @@ export default defineComponent({
         this.markers = [];
       }
     },
-    addMarkers: function(newVal: UfoSighting[]) {
-      const sightingsByLocation = this.groupBy(newVal, (sighting) => sighting?.latitude?.toString() + ' ' + sighting?.longitude?.toString());
+    addMarkers(newVal: UfoSighting[]) {
+      const sightingsByLocation = this.groupBy(newVal, (sighting: UfoSighting) => sighting?.latitude?.toString() + ' ' + sighting?.longitude?.toString()) as UfoSighting[][];
       const defaultCoords = this.findMaxAmountOfSightings(sightingsByLocation);
-      sightingsByLocation.forEach(multipleSightings => {
-        const marker = new L.marker([multipleSightings[0].latitude, multipleSightings[0].longitude]);
+      sightingsByLocation.forEach((multipleSightings: UfoSighting[]) => {
+        const marker = L.marker([multipleSightings[0].latitude, multipleSightings[0].longitude]);
         const markerWithTooltip = this.addTooltips(multipleSightings, marker);
         this.markers.push(markerWithTooltip);
         if (multipleSightings.length > 1) {
           const tooltip = L.tooltip({ content: `${multipleSightings.length}`, permanent: true, direction: 'top' })
           marker.bindTooltip(tooltip).openTooltip();
-          markerWithTooltip.on('click', () => markerWithTooltip.getTooltip().setOpacity(0));
-          markerWithTooltip.getPopup().on('remove', () => markerWithTooltip.getTooltip().setOpacity(.9))
+          markerWithTooltip.on('click', () => markerWithTooltip?.getTooltip()?.setOpacity(0));
+          markerWithTooltip?.getPopup()?.on('remove', () => markerWithTooltip?.getTooltip()?.setOpacity(.9))
         }
         markerWithTooltip.addTo(toRaw(this.map));
       });
@@ -67,25 +69,25 @@ export default defineComponent({
         this.map.setView([defaultCoords.latitude, defaultCoords.longitude], 8);
       }
     },
-    groupBy(array, keyFunc, gimmeDict?) {
+    groupBy(array: UfoSighting[], keyFunc: (x: UfoSighting) => string, gimmeDict?: boolean): UfoSighting[][] | {[key: string]: UfoSighting[]} {
       const groupedJsons = array.reduce((result, item) => {
-        const keyValue = keyFunc(item);
+        const keyValue: string = keyFunc(item);
         if (!result[keyValue]) {
           result[keyValue] = [];
         }
         result[keyValue].push(item);
         return result;
-      }, {});
+      }, {} as {[key: string]: UfoSighting[]});
       return !gimmeDict ? Object.values(groupedJsons) : groupedJsons;
     },
-    addTooltips: function(sightings, marker) {
+    addTooltips(sightings: UfoSighting[], marker: L.Marker): L.Marker {
       const mountEl = document.createElement('div');
       createApp({ extends: PopupContent }, { sightings: sightings, itemsPerPage: 1 }).mount(mountEl);
-      const myPopupVueEl = new L.popup().setContent(mountEl);
+      const myPopupVueEl = L.popup().setContent(mountEl);
       marker.bindPopup(myPopupVueEl).openPopup();
       return marker;
     },
-    findMaxAmountOfSightings: function(sightingsByLocation): CoordPair {
+    findMaxAmountOfSightings(sightingsByLocation: UfoSighting[][]): CoordPair {
       let zoomedCords: CoordPair = { latitude: 0, longitude: 0 };
       sightingsByLocation.reduce((max, current) => {
         if (current.length > max) {

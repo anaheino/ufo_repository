@@ -5,7 +5,7 @@
     <v-container class="bg-surface">
       <v-row no-gutters v-for="(sighting, index) in slicedSightings" :key="index">
         <v-col cols="2" sm="1">
-          <v-checkbox @update:modelValue="(val) => checkboxChanged(val, sighting)"></v-checkbox>
+          <v-checkbox @update:modelValue="(val: boolean) => checkboxChanged(val, sighting)"></v-checkbox>
         </v-col>
         <v-col cols="10" sm="6">
           <v-sheet class="ma-2 pa-2">
@@ -37,13 +37,13 @@
 <script lang="ts">
 
 import { defineComponent } from 'vue';
-import { UfoSighting } from '@/types/types';
+import type { UfoSighting } from '@/types/types';
 
 export default defineComponent({
   data() {
     return {
-      slicedSightings: [],
-      allSightings: [],
+      slicedSightings: [] as UfoSighting[],
+      allSightings: [] as UfoSighting[],
       currentPage: 1,
       start: 1,
       end: 20,
@@ -64,7 +64,7 @@ export default defineComponent({
     }
   },
   methods: {
-    pageChanged: function(newPage) {
+    pageChanged(newPage: number) {
       this.currentPage = newPage;
       const arrayStart = newPage > 1 ?  (newPage - 1) * this.perPage : 0;
       const end = (arrayStart + this.perPage);

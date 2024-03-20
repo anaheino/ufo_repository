@@ -33,9 +33,12 @@
 </template>
 
 <script lang="ts">
-export default {
+import { defineComponent } from "vue";
+import type { UfoSighting } from "@/types/types";
+
+export default defineComponent({
   props: {
-    sightings: Array,
+    sightings: Array as () => UfoSighting[],
     itemsPerPage: Number,
   },
   data() {
@@ -45,12 +48,12 @@ export default {
   },
   computed: {
     totalPages() {
-      return this.sightings.length;
+      return this.sightings?.length ?? 0;
     },
     displayedModels() {
-      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-      const endIndex = startIndex + this.itemsPerPage;
-      return this.sightings.slice(startIndex, endIndex);
+      const startIndex = (this.currentPage - 1) * (this.itemsPerPage ?? 1);
+      const endIndex = startIndex + (this.itemsPerPage ?? 0);
+      return this.sightings?.slice(startIndex, endIndex);
     },
   },
   methods: {
@@ -69,7 +72,7 @@ export default {
       }
     },
   },
-};
+});
 </script>
 <style>
   .tooltip-container {

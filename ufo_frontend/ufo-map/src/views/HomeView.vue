@@ -10,19 +10,21 @@
 <script lang="ts">
 import SightingMap from '@/components/SightingMap/SightingMap.vue';
 import Sidebar from '../components/SideBar/SideBar.vue';
+import type { UfoSighting} from "@/types/types";
+import { defineComponent } from "vue";
 
-export default {
+export default defineComponent({
   components: {
     Sidebar,
     SightingMap,
   },
   data() {
     return {
-      foundSightings: [],
+      foundSightings: [] as UfoSighting[],
     };
   },
   methods: {
-    markerUpdate(sightings: []) {
+    markerUpdate(sightings: UfoSighting[]) {
       if (!sightings) {
         this.foundSightings = [];
       } else {
@@ -30,7 +32,7 @@ export default {
       }
     }
   }
-};
+});
 
 </script>
 <style>
