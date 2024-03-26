@@ -50,11 +50,6 @@ export default defineComponent({
     totalPages() {
       return this.sightings?.length ?? 0;
     },
-    displayedModels() {
-      const startIndex = (this.currentPage - 1) * (this.itemsPerPage ?? 1);
-      const endIndex = startIndex + (this.itemsPerPage ?? 0);
-      return this.sightings?.slice(startIndex, endIndex);
-    },
   },
   methods: {
     nextPage() {

@@ -66,7 +66,7 @@ export default defineComponent({
   methods: {
     pageChanged(newPage: number) {
       this.currentPage = newPage;
-      const arrayStart = newPage > 1 ?  (newPage - 1) * this.perPage : 0;
+      const arrayStart = newPage > 1 ? (newPage - 1) * this.perPage : 0;
       const end = (arrayStart + this.perPage);
       this.slicedSightings = this.allSightings.slice(arrayStart, end);
       this.end = arrayStart + this.slicedSightings.length;

@@ -5,13 +5,13 @@
 <script lang="ts">
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { createApp, defineComponent, toRaw } from 'vue';
+import { defineComponent, toRaw } from 'vue';
 import type { PropType } from 'vue';
-import PopupContent from '@/components/Popup/PopupContent.vue';
 import type { UfoSighting, CoordPair } from "@/types/types";
+import { groupSightings } from "@/services/commonService";
+import { addMarkers, findMaxAmountOfSightings, queryProbability } from "@/components/SightingMap/SightingMap";
 
 export default defineComponent({
-
   props: {
     sightings: {
       type: Array as PropType<UfoSighting[]>,
@@ -19,11 +19,11 @@ export default defineComponent({
     },
   },
   watch: {
-    sightings(newVal: UfoSighting[]) {
-      if (newVal) {
+    sightings(updatedSightings: UfoSighting[]) {
+      if (updatedSightings) {
         this.clearMarkers();
-        if (newVal.length) {
-          this.addMarkers(newVal);
+        if (updatedSightings.length) {
+          this.addMarkers(updatedSightings);
         }
       }
     }
@@ -50,76 +50,19 @@ export default defineComponent({
         this.markers = [];
       }
     },
-    addMarkers(newVal: UfoSighting[]) {
-      const sightingsByLocation = this.groupBy(newVal, (sighting: UfoSighting) => sighting?.latitude?.toString() + ' ' + sighting?.longitude?.toString()) as UfoSighting[][];
-      const defaultCoords = this.findMaxAmountOfSightings(sightingsByLocation);
-      sightingsByLocation.forEach((multipleSightings: UfoSighting[]) => {
-        const marker = L.marker([multipleSightings[0].latitude, multipleSightings[0].longitude]);
-        const markerWithTooltip = this.addTooltips(multipleSightings, marker);
-        this.markers.push(markerWithTooltip);
-        if (multipleSightings.length > 1) {
-          const tooltip = L.tooltip({ content: `${multipleSightings.length}`, permanent: true, direction: 'top' })
-          marker.bindTooltip(tooltip).openTooltip();
-          markerWithTooltip.on('click', () => markerWithTooltip?.getTooltip()?.setOpacity(0));
-          markerWithTooltip?.getPopup()?.on('remove', () => markerWithTooltip?.getTooltip()?.setOpacity(.9))
-        }
-        markerWithTooltip.addTo(toRaw(this.map));
-      });
-      if (newVal?.length) {
+    addMarkers(updatedSightings: UfoSighting[]) {
+      const sightingsByLocation = groupSightings(updatedSightings, (sighting: UfoSighting) => sighting?.latitude?.toString() + ' ' + sighting?.longitude?.toString()) as UfoSighting[][];
+      const defaultCoords = findMaxAmountOfSightings(sightingsByLocation);
+      const markers = addMarkers(sightingsByLocation, this.markers as L.Marker[]);
+      markers.forEach(markerWithToolTip => markerWithToolTip.addTo(toRaw(this.map)));
+      if (updatedSightings?.length) {
         this.map.setView([defaultCoords.latitude, defaultCoords.longitude], 8);
       }
     },
-    groupBy(array: UfoSighting[], keyFunc: (x: UfoSighting) => string, gimmeDict?: boolean): UfoSighting[][] | {[key: string]: UfoSighting[]} {
-      const groupedJsons = array.reduce((result, item) => {
-        const keyValue: string = keyFunc(item);
-        if (!result[keyValue]) {
-          result[keyValue] = [];
-        }
-        result[keyValue].push(item);
-        return result;
-      }, {} as {[key: string]: UfoSighting[]});
-      return !gimmeDict ? Object.values(groupedJsons) : groupedJsons;
-    },
-    addTooltips(sightings: UfoSighting[], marker: L.Marker): L.Marker {
-      const mountEl = document.createElement('div');
-      createApp({ extends: PopupContent }, { sightings: sightings, itemsPerPage: 1 }).mount(mountEl);
-      const myPopupVueEl = L.popup().setContent(mountEl);
-      marker.bindPopup(myPopupVueEl).openPopup();
-      return marker;
-    },
-    findMaxAmountOfSightings(sightingsByLocation: UfoSighting[][]): CoordPair {
-      let zoomedCords: CoordPair = { latitude: 0, longitude: 0 };
-      sightingsByLocation.reduce((max, current) => {
-        if (current.length > max) {
-          max = current.length;
-          zoomedCords = {
-            latitude: current[0].latitude,
-            longitude: current[0].longitude,
-          }
-        }
-        return max;
-      }, 0);
-      return zoomedCords;
-    },
     async getProbability(latitude: string, longitude: string) {
-      let requestData = {
-        'latitude':latitude,
-        'longitude': longitude
-      };
-      try {
-        const response = await fetch(`http://localhost:8080/probability`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestData),
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.json();
-        this.popUpText = data.probability;
-        const popupOptions = {
+      const data = await queryProbability(latitude, longitude);
+      this.popUpText = data['probability'];
+      const popupOptions = {
           content: this.popupContent,
           popupOptions: {
             permanent: true,
@@ -130,9 +73,6 @@ export default defineComponent({
         L.popup(popupOptions)
             .setLatLng([data.latitude, data.longitude])
             .openOn(toRaw(this.map));
-      } catch (error) {
-        console.error('Error:', error);
-      }
     },
   },
   async mounted() {

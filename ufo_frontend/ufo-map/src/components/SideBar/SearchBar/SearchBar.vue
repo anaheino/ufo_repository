@@ -22,12 +22,15 @@
 
 <script lang="ts">
 
-import {defineComponent, toRaw} from 'vue';
-import type {DateRangeString, SearchTerms} from "@/types/types";
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
+import type { DateRangeString } from "@/types/types";
+import { querySightings } from "@/components/SideBar/SearchBar/SearchBar";
 
 export default defineComponent({
   props: {
     dates: {
+      type: Object as PropType<DateRangeString>,
       required: false,
     }
   },
@@ -38,30 +41,9 @@ export default defineComponent({
   },
   methods: {
     async performSearch() {
-      if (this.searchTerm.length > 0) {
-        const searchTerms: SearchTerms = {
-          searchTerm: this.searchTerm,
-          dates: toRaw(this.dates) as DateRangeString,
-        };
-        const searchParams = this.formSearchString(searchTerms);
-        const response = await fetch(`http://localhost:8080/search?searchTerm=${searchParams}`);
-        const sightings = await response.json();
-        this.$emit('search-sightings', sightings);
+      this.$emit('search-sightings', await querySightings(this.searchTerm, this.dates ?? {}));
       }
-    },
-    formSearchString(searchTerms: SearchTerms) {
-      let searchString = `${searchTerms.searchTerm}`;
-      if (searchTerms.dates) {
-        if (searchTerms.dates.startDate) {
-          searchString = searchString.concat(`&startDate=${searchTerms.dates.startDate}`)
-        }
-        if (searchTerms.dates.endDate) {
-          searchString = searchString.concat(`&endDate=${searchTerms.dates.endDate}`)
-        }
-      }
-      return searchString;
-    },
-  },
+    }
 });
 </script>
 
