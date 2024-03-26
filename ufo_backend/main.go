@@ -11,9 +11,16 @@ import (
 func main() {
 	router := gin.Default()
 	router.Use(corsMiddleware())
-	router.GET("/search", controllers.SearchSightings)
-	router.GET("/test", controllers.TestEndpoint)
-	router.POST("/probability", controllers.RandomForestForCoordinates)
+
+	sightingController := controllers.NewSightingsController(nil)
+	sightingController.Init()
+
+	machineLearningController := controllers.NewMachineLearningController(nil)
+	machineLearningController.Init()
+
+	router.GET("/search", sightingController.SearchSightings)
+	router.POST("/probability", machineLearningController.RandomForestForCoordinates)
+
 	uri := fmt.Sprintf("%s:8080", os.Getenv("localhost"))
 	fmt.Printf(uri)
 	router.Run(uri)

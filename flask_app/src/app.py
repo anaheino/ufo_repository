@@ -7,13 +7,6 @@ app = Flask(__name__)
 
 with open('models/random_forest_model.pkl', 'rb') as file:
     random_forest = pickle.load(file)
-
-@app.route('/api/data', methods=['GET'])
-def get_data():
-    # Example data
-    data = {'message': 'Hello, this is a lightweight REST API without a database!'}
-    return jsonify(data)
-
 @app.route('/coordinates/likelihood', methods=['POST'])
 def run_coords_through_random_forest():
     print("Running coords through random forest model")

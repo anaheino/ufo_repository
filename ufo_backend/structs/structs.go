@@ -1,5 +1,7 @@
 package structs
 
+import "go.mongodb.org/mongo-driver/bson"
+
 type Coordinates struct {
 	Latitude  interface{} `json:"latitude"`
 	Longitude interface{} `json:"longitude"`
@@ -27,4 +29,9 @@ type Probability struct {
 type CoordinatesProbability struct {
 	Coordinates
 	Probability
+}
+type SearchTerms struct {
+	SearchTerm bson.M `bson:"$search,omitempty"`
+	StartDate  string `bson:"startDate,omitempty"`
+	EndDate    string `bson:"endDate,omitempty"`
 }
