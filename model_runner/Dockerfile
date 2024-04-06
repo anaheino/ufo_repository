@@ -5,5 +5,5 @@ WORKDIR /app/src
 COPY src/requirements.txt .
 RUN pip install --trusted-host pypi.python.org -r requirements.txt
 EXPOSE 5000
-ENV NAME FlaskApp
+ENV NAME ModelRunner
 CMD ["python", "app.py"]

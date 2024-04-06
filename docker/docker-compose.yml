@@ -19,8 +19,8 @@ services:
     build: '../mongo'
     ports:
       - "27017:27017"
-  flaskmachine:
-    container_name: flask_machine
-    build: '../run_model_rest'
+  modelrunner:
+    container_name: model_runner
+    build: '../model_runner'
     ports:
       - "5000:5000"
