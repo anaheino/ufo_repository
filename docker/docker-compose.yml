@@ -21,6 +21,6 @@ services:
       - "27017:27017"
   flaskmachine:
     container_name: flask_machine
-    build: '../flask_app'
+    build: '../run_model_rest'
     ports:
       - "5000:5000"
