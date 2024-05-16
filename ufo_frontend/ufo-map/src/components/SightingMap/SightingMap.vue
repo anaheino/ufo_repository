@@ -39,7 +39,16 @@ export default defineComponent({
   },
   computed: {
     popupContent() {
-      return `<div>${this.popUpText}</div>`;
+      return `<div>
+               <div>
+                 <h4>Probability of sighting:</h4>
+                 <p>${this.popUpText}</p>
+              </div>
+              <div>
+                <h5>Did you see something?</h5>
+                <button>Report Now</button>
+              </div>
+            </div>`;
     },
   },
   methods: {
@@ -88,8 +97,8 @@ export default defineComponent({
 
 <style>
 .red-tooltip {
-  width: 6vw;
   padding: 0px;
+  width: 10vw;
   .leaflet-popup-content-wrapper {
     .leaflet-popup-content {
       font-weight: bold;
