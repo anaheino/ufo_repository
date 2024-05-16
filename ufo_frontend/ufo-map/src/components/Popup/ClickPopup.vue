@@ -23,7 +23,7 @@ export default defineComponent({
   },
   methods: {
     reportNow() {
-      console.log('reported');
+      this.$emit('sighting', true);
     },
   },
 });

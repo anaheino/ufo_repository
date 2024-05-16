@@ -2,7 +2,10 @@
   <main>
       <div id="content">
         <Sidebar @sightings-update="markerUpdate" />
-        <SightingMap :sightings="foundSightings"/>
+        <SightingMap :sightings="foundSightings" @add-sighting="addSighting"/>
+        <div>
+          {{addingSighting}}
+        </div>
       </div>
   </main>
 </template>
@@ -21,6 +24,7 @@ export default defineComponent({
   data() {
     return {
       foundSightings: [] as UfoSighting[],
+      addingSighting: false,
     };
   },
   methods: {
@@ -30,6 +34,9 @@ export default defineComponent({
       } else {
         this.foundSightings = sightings;
       }
+    },
+    addSighting(addSighting: boolean) {
+      this.addingSighting = addSighting;
     }
   }
 });

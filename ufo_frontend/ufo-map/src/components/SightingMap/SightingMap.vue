@@ -37,6 +37,7 @@ export default defineComponent({
       markers: [] as L.Marker[],
       popUpText: 'default value',
       tooltips: [] as L.Tooltip[],
+      addSighting: false,
     };
   },
   methods: {
@@ -56,10 +57,17 @@ export default defineComponent({
         this.map.setView([defaultCoords.latitude, defaultCoords.longitude], 8);
       }
     },
+    toggleEdit() {
+      this.$emit('add-sighting', true);
+    },
     async getProbability(latitude: string, longitude: string) {
       const data = await queryProbability(latitude, longitude);
       const mountEl = document.createElement('div');
-      createApp({ extends: ClickPopup }, { probability: data['probability'] }).mount(mountEl);
+      const popup = createApp(ClickPopup, {
+        probability: data['probability'],
+        onSighting: this.toggleEdit
+      });
+      popup.mount(mountEl);
       const myPopupVueEl = L.popup().setContent(mountEl);
       myPopupVueEl
             .setLatLng([data.latitude, data.longitude])
