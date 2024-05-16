@@ -1,7 +1,7 @@
 import type { UfoSighting, CoordPair } from "@/types/types";
 import L from "leaflet";
 import { createApp } from "vue";
-import PopupContent from "@/components/Popup/PopupContent.vue";
+import PopupContent from "@/components/Popup/SightingPopup.vue";
 
 export const addMarkers = (sightingsByLocation: UfoSighting[][], markers: L.Marker[]) => {
     return sightingsByLocation.map((multipleSightings: UfoSighting[]) => {

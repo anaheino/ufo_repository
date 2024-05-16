@@ -10,6 +10,8 @@ import type { PropType } from 'vue';
 import type { UfoSighting, CoordPair } from "@/types/types";
 import { groupSightings } from "@/services/commonService";
 import { addMarkers, findMaxAmountOfSightings, queryProbability } from "@/components/SightingMap/SightingMap";
+import { createApp } from "vue";
+import ClickPopup from "@/components/Popup/ClickPopup.vue";
 
 export default defineComponent({
   props: {
@@ -37,20 +39,6 @@ export default defineComponent({
       tooltips: [] as L.Tooltip[],
     };
   },
-  computed: {
-    popupContent() {
-      return `<div>
-               <div>
-                 <h4>Probability of sighting:</h4>
-                 <p>${this.popUpText}</p>
-              </div>
-              <div>
-                <h5>Did you see something?</h5>
-                <button>Report Now</button>
-              </div>
-            </div>`;
-    },
-  },
   methods: {
     clearMarkers: function() {
       if (this.markers && this.markers.length) {
@@ -70,16 +58,10 @@ export default defineComponent({
     },
     async getProbability(latitude: string, longitude: string) {
       const data = await queryProbability(latitude, longitude);
-      this.popUpText = data['probability'];
-      const popupOptions = {
-          content: this.popupContent,
-          popupOptions: {
-            permanent: true,
-            direction: 'center',
-          },
-          className: 'red-tooltip',
-        };
-        L.popup(popupOptions)
+      const mountEl = document.createElement('div');
+      createApp({ extends: ClickPopup }, { probability: data['probability'] }).mount(mountEl);
+      const myPopupVueEl = L.popup().setContent(mountEl);
+      myPopupVueEl
             .setLatLng([data.latitude, data.longitude])
             .openOn(toRaw(this.map));
     },
@@ -98,7 +80,7 @@ export default defineComponent({
 <style>
 .red-tooltip {
   padding: 0px;
-  width: 10vw;
+  max-width: 20vw;
   .leaflet-popup-content-wrapper {
     .leaflet-popup-content {
       font-weight: bold;
