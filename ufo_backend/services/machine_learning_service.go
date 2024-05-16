@@ -30,6 +30,8 @@ func (s *MachineLearningService) Initialize() error {
 
 func (s *MachineLearningService) RandomForestCoordinates(jsonData []byte) structs.Probability {
 	client := &http.Client{}
+	fmt.Println("Trying to likelihood")
+	fmt.Println(s.randomForestURL)
 	req, err := http.NewRequest("POST", s.randomForestURL, bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Fatal("Failure on post request")

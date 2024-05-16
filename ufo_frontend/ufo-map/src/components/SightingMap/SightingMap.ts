@@ -54,8 +54,7 @@ export const queryProbability = async (latitude: string, longitude: string)=> {
             },
             body: JSON.stringify(requestData),
         });
-        const data = await response.json();
-        return data;
+        return await response.json();
     } catch (error) {
         console.error('Error:', error);
     }

@@ -12,7 +12,7 @@ y = ufo_data['sighting']
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Initialize the RanMONGOST5OPdfddom Forest classifier
+# Initialize the Random Forest classifier
 rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
 
 # Train the model
