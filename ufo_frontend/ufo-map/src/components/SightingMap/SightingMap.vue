@@ -61,6 +61,7 @@ export default defineComponent({
       this.$emit('add-sighting', true);
     },
     async getProbability(latitude: string, longitude: string) {
+      this.$emit('new-coordinates', { latitude, longitude });
       const data = await queryProbability(latitude, longitude);
       const mountEl = document.createElement('div');
       const popup = createApp(ClickPopup, {
