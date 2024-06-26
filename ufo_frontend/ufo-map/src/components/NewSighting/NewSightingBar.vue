@@ -5,11 +5,8 @@
         <v-main>
           <div>Add sighting</div>
           <button @click="closeBar">Close</button>
-
             <v-sheet class="mx-auto" width="300">
-
               <v-form ref="form">
-
                 <v-text-field
                     v-model="coordinates.latitude"
                     label="Latitude"
@@ -20,7 +17,29 @@
                     label="Longitude"
                     readonly
                 ></v-text-field>
-
+                <v-text-field
+                    v-model="currentSighting.city"
+                    :counter="10"
+                    :rules="textFieldRules"
+                    label="City"
+                    required
+                ></v-text-field>
+                <v-text-field
+                    v-model="currentSighting.country"
+                    :counter="10"
+                    :rules="textFieldRules"
+                    label="Country"
+                    required
+                ></v-text-field>
+                <v-text-field
+                    type="datetime-local"
+                    v-model="currentSighting.date"
+                    required
+                />
+                <v-text-field
+                    v-model="currentSighting.duration"
+                    label="Event duration"
+                ></v-text-field>
                 <v-text-field
                     v-model="currentSighting.shape"
                     :counter="10"
@@ -28,7 +47,12 @@
                     label="Shape"
                     required
                 ></v-text-field>
-
+                <v-textarea
+                    v-model="currentSighting.description"
+                    :rules="textFieldRules"
+                    label="Description"
+                    required
+                ></v-textarea>
                 <!--<v-select
                     v-model="select"
                     :items="items"
@@ -36,14 +60,12 @@
                     label="Item"
                     required
                 ></v-select>-->
-
                 <v-checkbox
                     v-model="checkbox"
                     :rules="[v => !!v || 'You must agree to continue!']"
                     label="Do you agree?"
                     required
                 ></v-checkbox>
-
                 <div class="d-flex flex-column">
                   <v-btn
                       class="mt-4"
@@ -53,7 +75,6 @@
                   >
                     Validate
                   </v-btn>
-
                   <v-btn
                       class="mt-4"
                       color="error"
@@ -62,7 +83,6 @@
                   >
                     Reset Form
                   </v-btn>
-
                   <v-btn
                       class="mt-4"
                       color="warning"
@@ -97,6 +117,9 @@ export default {
       currentSighting: {} as UfoSighting,
       shapeRules: [
         v => !!v || 'Shape is required',
+      ],
+      textFieldRules: [
+          v => !!v || 'Item is required',
       ],
       select: null,
       checkbox: false,
