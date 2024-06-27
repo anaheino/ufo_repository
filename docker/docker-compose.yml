@@ -3,24 +3,42 @@ services:
   ufobackend:
     container_name: ufo_backend
     build: '../ufo_backend'
+    networks:
+      ufo_network:
+        ipv4_address: 172.20.0.2
     ports:
       - "8080:8080"
     environment:
-      - MONGODB_UFO_URI=mongodb://rust-scraper:iwanttobelieve@172.17.0.1:27017/i_want_to_believe?retryWrites=true&w=majority&authSource=admin
+      - MONGODB_UFO_URI=mongodb://rust-scraper:iwanttobelieve@172.20.0.5:27017/i_want_to_believe?retryWrites=true&w=majority&authSource=admin
       - localhost=0.0.0.0
       - MACHINE_LEARNING_URI=http://modelrunner:5000
   ufomap:
     container_name: ufo_map
     build: '../ufo_frontend/ufo-map'
+    networks:
+      ufo_network:
+        ipv4_address: 172.20.0.3
     ports:
       - "5173:5173"
-  ufodb:
-    container_name: ufo_db
-    build: '../mongo'
-    ports:
-      - "27017:27017"
   modelrunner:
     container_name: model_runner
     build: '../model_runner'
+    networks:
+      ufo_network:
+        ipv4_address: 172.20.0.4
     ports:
       - "5000:5000"
+  ufodb:
+    container_name: ufo_db
+    build: '../mongo'
+    networks:
+      ufo_network:
+        ipv4_address: 172.20.0.5
+    ports:
+      - "27017:27017"
+networks:
+  ufo_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24

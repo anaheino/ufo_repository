@@ -6,7 +6,7 @@
     </div>
     <v-row>
     <div class="date-container">
-      <v-col cols="1">
+      <v-col cols="12">
       <div class="date">
         Start date
         <v-text-field type="datetime-local" v-model="startDate" :clearable="true" @update:modelValue="dateChanged"/>
@@ -16,7 +16,7 @@
     </v-row>
     <v-row>
     <div class="date-container">
-      <v-col cols="1">
+      <v-col cols="12">
       <div class="date">
         End date
         <div class="date">

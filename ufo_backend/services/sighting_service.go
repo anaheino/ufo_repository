@@ -39,7 +39,6 @@ func (s *SightingService) Initialize() error {
 	s.db = client.Database("i_want_to_believe")
 	s.defaultFindOptions = findOptions
 	log.Printf("Mongo connection should be fine!")
-
 	return nil
 }
 
