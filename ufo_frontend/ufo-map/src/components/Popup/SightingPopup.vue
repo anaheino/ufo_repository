@@ -13,7 +13,7 @@
         <h4>Short description:</h4>
         <p>{{sighting.description}}</p>
         <b v-if="sighting.has_images">This report includes images.</b>
-        <a :href="sighting.link" target="_blank">Link to full sighting</a>
+        <a v-if="sighting.link" :href="sighting.link" target="_blank">Link to full sighting</a>
       </div>
     </div>
   </div>

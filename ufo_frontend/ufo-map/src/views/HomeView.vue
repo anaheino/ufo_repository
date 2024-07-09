@@ -42,13 +42,14 @@ export default defineComponent({
     },
     async newSighting(sighting: UfoSighting) {
       await insertSighting(sighting);
+      this.foundSightings = [];
     },
     closeBar(close: boolean) {
       this.addingSighting = !close;
     },
     updateCoordinates(coordinates: { latitude: string, longitude: string }) {
       this.coordinates = coordinates;
-    }
+    },
   }
 });
 
