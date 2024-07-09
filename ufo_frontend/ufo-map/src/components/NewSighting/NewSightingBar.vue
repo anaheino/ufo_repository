@@ -32,6 +32,11 @@
                     required
                 ></v-text-field>
                 <v-text-field
+                    v-model="currentSighting.state"
+                    :counter="10"
+                    label="State"
+                ></v-text-field>
+                <v-text-field
                     type="datetime-local"
                     v-model="currentSighting.date"
                     required
@@ -53,19 +58,6 @@
                     label="Description"
                     required
                 ></v-textarea>
-                <!--<v-select
-                    v-model="select"
-                    :items="items"
-                    :rules="[v => !!v || 'Item is required']"
-                    label="Item"
-                    required
-                ></v-select>-->
-                <v-checkbox
-                    v-model="checkbox"
-                    :rules="[v => !!v || 'You must agree to continue!']"
-                    label="Do you agree?"
-                    required
-                ></v-checkbox>
                 <div class="d-flex flex-column">
                   <v-btn
                       class="mt-4"
@@ -132,9 +124,17 @@ export default {
       this.$emit('close-bar', true);
     },
     async validate () {
-      const { valid } = await this.$refs.form.validate()
-
-      if (valid) alert('Form is valid')
+      const { valid } = await this.$refs.form.validate();
+      if (valid) {
+        this.newSighting({
+          ...this.currentSighting,
+          report_date: new Date().toISOString().slice(0, 16),
+          latitude: Number(this.coordinates.latitude),
+          longitude: Number(this.coordinates.longitude),
+          link: '',
+          has_images: false,
+      });
+      }
     },
     reset () {
       this.$refs.form.reset()

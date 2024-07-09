@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"ufo_backend/services"
+	"ufo_backend/structs"
 )
 
 type SightingController struct {
@@ -26,5 +27,15 @@ func (controller *SightingController) SearchSightings(c *gin.Context) {
 	endDate := c.DefaultQuery("endDate", "")
 	searchTerm := c.DefaultQuery("searchTerm", "")
 	results := controller.sightingService.QuerySightings(searchTerm, startDate, endDate)
+	c.IndentedJSON(http.StatusOK, results)
+}
+
+func (controller *SightingController) CreateSighting(c *gin.Context) {
+	var sighting structs.Sighting
+	if err := c.ShouldBindJSON(&sighting); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	results := controller.sightingService.CreateSighting(sighting)
 	c.IndentedJSON(http.StatusOK, results)
 }

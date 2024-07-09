@@ -14,6 +14,7 @@ import Sidebar from '../components/SideBar/SideBar.vue';
 import NewSightingBar from "@/components/NewSighting/NewSightingBar.vue";
 import type { UfoSighting} from "@/types/types";
 import { defineComponent } from "vue";
+import { insertSighting } from "@/views/HomeView";
 
 export default defineComponent({
   components: {
@@ -39,8 +40,8 @@ export default defineComponent({
     addSighting(addSighting: boolean) {
       this.addingSighting = addSighting;
     },
-    newSighting(sighting: UfoSighting) {
-      console.log(sighting);
+    async newSighting(sighting: UfoSighting) {
+      await insertSighting(sighting);
     },
     closeBar(close: boolean) {
       this.addingSighting = !close;

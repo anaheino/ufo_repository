@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
@@ -67,4 +68,24 @@ func (s *SightingService) QuerySightings(searchTerm string, startDate string, en
 		return nil
 	}
 	return results
+}
+
+func (s *SightingService) CreateSighting(sighting structs.Sighting) string {
+	var sightingsCollection = s.db.Collection("sightings_with_coords")
+	insertResult, err := sightingsCollection.InsertOne(context.TODO(), sighting)
+	if err != nil {
+		fmt.Printf(err.Error())
+		fmt.Printf("Failed to insert document: %s\n", sighting)
+		return ""
+	}
+	return insertIDToString(insertResult.InsertedID)
+}
+
+func insertIDToString(id interface{}) string {
+	switch v := id.(type) {
+	case primitive.ObjectID:
+		return v.Hex()
+	default:
+		return fmt.Sprintf("%v", v)
+	}
 }

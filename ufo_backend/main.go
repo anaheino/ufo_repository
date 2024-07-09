@@ -19,6 +19,7 @@ func main() {
 	machineLearningController.Init()
 
 	router.GET("/search", sightingController.SearchSightings)
+	router.POST("/sighting", sightingController.CreateSighting)
 	router.POST("/probability", machineLearningController.RandomForestForCoordinates)
 
 	uri := fmt.Sprintf("%s:8080", os.Getenv("localhost"))
