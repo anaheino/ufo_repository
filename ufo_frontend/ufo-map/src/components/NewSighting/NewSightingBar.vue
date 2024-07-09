@@ -65,7 +65,7 @@
                       block
                       @click="validate"
                   >
-                    Validate
+                    Submit
                   </v-btn>
                   <v-btn
                       class="mt-4"
@@ -74,14 +74,6 @@
                       @click="reset"
                   >
                     Reset Form
-                  </v-btn>
-                  <v-btn
-                      class="mt-4"
-                      color="warning"
-                      block
-                      @click="resetValidation"
-                  >
-                    Reset Validation
                   </v-btn>
                 </div>
               </v-form>
@@ -134,13 +126,11 @@ export default {
           link: '',
           has_images: false,
       });
+        this.closeBar();
       }
     },
     reset () {
       this.$refs.form.reset()
-    },
-    resetValidation () {
-      this.$refs.form.resetValidation()
     },
   }
 };
