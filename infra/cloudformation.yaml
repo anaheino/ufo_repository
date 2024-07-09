@@ -1,42 +1,55 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Basic CloudFormation template to deploy infrastructure for the ufo map.
+Description: 'ECS Fargate stack with Docker containers for frontend, backend, MongoDB, and Flask API.'
+
+Parameters:
+  VpcCidr:
+    Type: String
+    Default: 10.0.0.0/16
+    Description: 'VPC CIDR block'
+
+  SubnetCidr1:
+    Type: String
+    Default: 10.0.1.0/24
+    Description: 'Public Subnet CIDR block 1'
+
+  SubnetCidr2:
+    Type: String
+    Default: 10.0.2.0/24
+    Description: 'Public Subnet CIDR block 2'
+
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instances
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: must be the name of an existing EC2 KeyPair.
 
 Resources:
+
+  # VPC
   VPC:
     Type: AWS::EC2::VPC
     Properties:
-      CidrBlock: 10.0.0.0/16
+      CidrBlock: !Ref VpcCidr
       EnableDnsSupport: true
       EnableDnsHostnames: true
-      Tags:
-        - Key: Name
-          Value: MyVPC
 
-  PublicSubnet:
+  # Subnets
+  Subnet1:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: 10.0.1.0/24
+      CidrBlock: !Ref SubnetCidr1
       MapPublicIpOnLaunch: true
-      Tags:
-        - Key: Name
-          Value: PublicSubnet
 
-  PrivateSubnet:
+  Subnet2:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: 10.0.2.0/24
-      Tags:
-        - Key: Name
-          Value: PrivateSubnet
+      CidrBlock: !Ref SubnetCidr2
+      MapPublicIpOnLaunch: true
 
+  # Internet Gateway
   InternetGateway:
     Type: AWS::EC2::InternetGateway
-    Properties:
-      Tags:
-        - Key: Name
-          Value: MyInternetGateway
 
   AttachGateway:
     Type: AWS::EC2::VPCGatewayAttachment
@@ -44,150 +57,228 @@ Resources:
       VpcId: !Ref VPC
       InternetGatewayId: !Ref InternetGateway
 
+  # Route Table
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref VPC
-      Tags:
-        - Key: Name
-          Value: PublicRouteTable
 
   PublicRoute:
     Type: AWS::EC2::Route
-    DependsOn: AttachGateway
     Properties:
       RouteTableId: !Ref PublicRouteTable
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
 
-  PublicSubnetRouteTableAssociation:
+  Subnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref PublicSubnet
+      SubnetId: !Ref Subnet1
       RouteTableId: !Ref PublicRouteTable
 
-  MongoDBSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
+  Subnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      GroupDescription: Security group for MongoDB server
-      VpcId: !Ref VPC
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 27017
-          ToPort: 27017
-          CidrIp: 10.0.0.0/16  # Allow access within the VPC
+      SubnetId: !Ref Subnet2
+      RouteTableId: !Ref PublicRouteTable
 
-  BackendSecurityGroup:
+  # Security Group
+  InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Security group for Backend servers
+      GroupDescription: Enable HTTP access
       VpcId: !Ref VPC
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
-          CidrIp: 0.0.0.0/0  # Allow HTTP access from anywhere
+          CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
           FromPort: 27017
           ToPort: 27017
-          SourceSecurityGroupId: !Ref MongoDBSecurityGroup  # Allow access from MongoDB Security Group
+          CidrIp: 0.0.0.0/0
 
-  BackendLoadBalancer:
-    Type: AWS::ElasticLoadBalancing::LoadBalancer
+  # ECS Cluster
+  ECSCluster:
+    Type: AWS::ECS::Cluster
     Properties:
-      Subnets:
-        - !Ref PublicSubnet
-      SecurityGroups:
-        - !Ref BackendSecurityGroup
-      Listeners:
-        - LoadBalancerPort: 80
-          InstancePort: 80
-          Protocol: HTTP
-      HealthCheck:
-        Target: HTTP:80/
-        HealthyThreshold: 3
-        UnhealthyThreshold: 5
-        Interval: 30
-        Timeout: 5
+      ClusterName: my-ecs-cluster
 
-  MongoDBLaunchConfiguration:
-    Type: AWS::AutoScaling::LaunchConfiguration
+  # IAM Role for ECS Tasks
+  ECSServiceRole:
+    Type: AWS::IAM::Role
     Properties:
-      ImageId: ami-<your-mongodb-golden-ami>
-      InstanceType: t3.medium
-      SecurityGroups:
-        - !Ref MongoDBSecurityGroup
-      KeyName: <your-key-pair>
-      AssociatePublicIpAddress: false  # In a private subnet
-
-  MongoDBAutoScalingGroup:
-    Type: AWS::AutoScaling::AutoScalingGroup
-    Properties:
-      VPCZoneIdentifier:
-        - !Ref PrivateSubnet
-      LaunchConfigurationName: !Ref MongoDBLaunchConfiguration
-      MinSize: 1
-      MaxSize: 3
-      DesiredCapacity: 1
-
-  BackendLaunchConfiguration:
-    Type: AWS::AutoScaling::LaunchConfiguration
-    Properties:
-      ImageId: ami-<your-backend-golden-ami>
-      InstanceType: t3.medium
-      SecurityGroups:
-        - !Ref BackendSecurityGroup
-      KeyName: <your-key-pair>
-      AssociatePublicIpAddress: false  # In a private subnet
-      UserData: !Base64 |
-        #!/bin/bash
-        # Commands to start your backend application
-
-  BackendAutoScalingGroup:
-    Type: AWS::AutoScaling::AutoScalingGroup
-    Properties:
-      VPCZoneIdentifier:
-        - !Ref PrivateSubnet
-      LaunchConfigurationName: !Ref BackendLaunchConfiguration
-      MinSize: 1
-      MaxSize: 3
-      DesiredCapacity: 2
-      LoadBalancerNames:
-        - !Ref BackendLoadBalancer
-
-  FrontendS3Bucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: your-frontend-bucket-name
-
-  FrontendS3BucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref FrontendS3Bucket
-      PolicyDocument:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
         Statement:
           - Effect: Allow
-            Principal: "*"
-            Action: "s3:GetObject"
-            Resource: "arn:aws:s3:::your-frontend-bucket-name/*"
+            Principal:
+              Service: ecs.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: ECSServiceRolePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ecs:CreateCluster
+                  - ecs:DeregisterContainerInstance
+                  - ecs:DiscoverPollEndpoint
+                  - ecs:Poll
+                  - ecs:RegisterContainerInstance
+                  - ecs:StartTelemetrySession
+                  - ecs:Submit*
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
 
-Outputs:
-  VPCId:
-    Description: The VPC Id
-    Value: !Ref VPC
+  ECSExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
 
-  PublicSubnetId:
-    Description: The Public Subnet Id
-    Value: !Ref PublicSubnet
+  ECSExecutionRoleInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref ECSExecutionRole
 
-  PrivateSubnetId:
-    Description: The Private Subnet Id
-    Value: !Ref PrivateSubnet
+  # Task Definitions
+  FrontendTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      RequiresCompatibilities: [FARGATE]
+      Cpu: '256'
+      Memory: '512'
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !Ref ECSExecutionRole
+      ContainerDefinitions:
+        - Name: frontend
+          Image: your-docker-repo/frontend:latest
+          PortMappings:
+            - ContainerPort: 80
+              HostPort: 80
 
-  BackendLoadBalancerDNSName:
-    Description: The DNS name of the Backend Load Balancer
-    Value: !GetAtt BackendLoadBalancer.DNSName
+  BackendTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      RequiresCompatibilities: [FARGATE]
+      Cpu: '256'
+      Memory: '512'
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !Ref ECSExecutionRole
+      ContainerDefinitions:
+        - Name: backend
+          Image: your-docker-repo/backend:latest
+          PortMappings:
+            - ContainerPort: 80
+              HostPort: 80
 
-  FrontendS3BucketName:
-    Description: The name of the S3 bucket for the Frontend
-    Value: !Ref FrontendS3Bucket
+  MongoDBTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      RequiresCompatibilities: [FARGATE]
+      Cpu: '512'
+      Memory: '1024'
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !Ref ECSExecutionRole
+      ContainerDefinitions:
+        - Name: mongodb
+          Image: mongo:latest
+          PortMappings:
+            - ContainerPort: 27017
+              HostPort: 27017
+
+  FlaskApiTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      RequiresCompatibilities: [FARGATE]
+      Cpu: '256'
+      Memory: '512'
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !Ref ECSExecutionRole
+      ContainerDefinitions:
+        - Name: flask-api
+          Image: your-docker-repo/flask-api:latest
+          PortMappings:
+            - ContainerPort: 5000
+              HostPort: 5000
+          Environment:
+            - Name: MODEL_PATH
+              Value: s3://your-bucket-name/model.pkl
+
+  # ECS Services
+  FrontendService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref ECSCluster
+      DesiredCount: 1
+      LaunchType: FARGATE
+      TaskDefinition: !Ref FrontendTaskDefinition
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !Ref Subnet1
+            - !Ref Subnet2
+          SecurityGroups:
+            - !Ref InstanceSecurityGroup
+
+  BackendService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref ECSCluster
+      DesiredCount: 1
+      LaunchType: FARGATE
+      TaskDefinition: !Ref BackendTaskDefinition
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !Ref Subnet1
+            - !Ref Subnet2
+          SecurityGroups:
+            - !Ref InstanceSecurityGroup
+
+  MongoDBService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref ECSCluster
+      DesiredCount: 1
+      LaunchType: FARGATE
+      TaskDefinition: !Ref MongoDBTaskDefinition
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !Ref Subnet1
+            - !Ref Subnet2
+          SecurityGroups:
+            - !Ref InstanceSecurityGroup
+
+  FlaskApiService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref ECSCluster
+      DesiredCount: 1
+      LaunchType: FARGATE
+      TaskDefinition: !Ref FlaskApiTaskDefinition
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !Ref Subnet1
+            - !Ref
