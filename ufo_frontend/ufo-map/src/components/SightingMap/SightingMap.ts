@@ -2,6 +2,7 @@ import type { UfoSighting, CoordPair } from "@/types/types";
 import L from "leaflet";
 import { createApp } from "vue";
 import PopupContent from "@/components/Popup/SightingPopup.vue";
+import {backendUrl} from "@/constants/contants";
 
 export const addMarkers = (sightingsByLocation: UfoSighting[][], markers: L.Marker[]) => {
     return sightingsByLocation.map((multipleSightings: UfoSighting[]) => {
@@ -47,7 +48,7 @@ export const queryProbability = async (latitude: string, longitude: string)=> {
         'longitude': longitude
     };
     try {
-        const response = await fetch(`http://localhost:8080/probability`, {
+        const response = await fetch(`${backendUrl}/probability`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

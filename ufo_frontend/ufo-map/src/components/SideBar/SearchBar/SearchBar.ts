@@ -1,5 +1,6 @@
 import type { DateRangeString, SearchTerms } from "@/types/types";
 import { toRaw } from "vue";
+import {backendUrl} from "@/constants/contants";
 
 export const querySightings = async (searchTerm: string, dates: DateRangeString) => {
     if (searchTerm.length > 0) {
@@ -8,7 +9,7 @@ export const querySightings = async (searchTerm: string, dates: DateRangeString)
             dates: toRaw(dates),
         };
         const searchParams = formSearchString(searchTerms);
-        const response = await fetch(`http://localhost:8080/search?searchTerm=${searchParams}`);
+        const response = await fetch(`${backendUrl}/search?searchTerm=${searchParams}`);
         return await response.json();
     }
 };

@@ -1,8 +1,9 @@
 import type { UfoSighting } from '@/types/types';
+import {backendUrl} from "@/constants/contants";
 
 export const insertSighting = async (sighting: UfoSighting)=> {
     try {
-        const response = await fetch('http://localhost:8080/sighting', {
+        const response = await fetch(`${backendUrl}/sighting`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
