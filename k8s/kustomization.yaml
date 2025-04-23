@@ -1,0 +1,8 @@
+namespace: ufo-app
+resources:
+  - namespace.yaml
+  - ufobackend.yaml
+  - ufomap.yaml
+  - modelrunner.yaml
+  - ufodb.yaml
+  - ingress.yaml

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ufobackend
+  namespace: ufo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ufobackend
+  template:
+    metadata:
+      labels:
+        app: ufobackend
+    spec:
+      containers:
+        - name: ufobackend
+          image: localhost:5001/ufobackend:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MONGODB_UFO_URI
+              value: mongodb://rust-scraper:iwanttobelieve@ufodb:27017/i_want_to_believe?retryWrites=true&w=majority&authSource=admin
+            - name: localhost
+              value: 0.0.0.0
+            - name: MACHINE_LEARNING_URI
+              value: http://modelrunner:5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ufobackend
+  namespace: ufo-app
+spec:
+  selector:
+    app: ufobackend
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080

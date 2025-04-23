@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ufo-ingress
+  namespace: ufo-app
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  rules:
+    - host: ufo.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ufomap
+                port:
+                  number: 5173
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: ufobackend
+                port:
+                  number: 8080
+          - path: /ml
+            pathType: Prefix
+            backend:
+              service:
+                name: modelrunner
+                port:
+                  number: 5000
